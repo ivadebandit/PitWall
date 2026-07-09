@@ -1,0 +1,17 @@
+# Cache folder, too large to upload
+cache/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Generated chart images
+*.png
+
+# Environment files
+.env
+
+# VS Code settings
+.vscode/
+
+zero-adder-util/

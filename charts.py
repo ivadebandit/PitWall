@@ -46,15 +46,12 @@ def get_driver_color(session, driver):
     """
 
     try:
-        # FastF1 stores each driver's info including team color
         driver_info = session.get_driver(driver)
         color = driver_info['TeamColor']
 
-        # TeamColor comes back as a hex code but without #
         return f"#{color}"
 
     except:
-        # if color not found use first default color
         return DEFAULT_COLORS[0]
     
 def apply_f1_theme(fig):
@@ -113,12 +110,10 @@ def chart_race_pace(session, driver):
     driver  = three letter driver code
     """
 
-    # Get all laps
     laps = get_driver_laps(session, driver)
     laps = laps.copy()
     laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
 
-    # Drop laps with no lap time recorded
     laps = laps.dropna(subset=['LapTimeSeconds'])
 
     color = get_driver_color(session, driver)
@@ -133,13 +128,15 @@ def chart_race_pace(session, driver):
 
     fig = go.Figure()
 
-    # Loop through each stint and add a line 
     for stint in laps['Stint'].unique():
         stint_laps = laps[laps['Stint'] == stint]
+
+        if stint_laps.empty:
+            continue
+        
         compound = stint_laps['Compound'].iloc[0]
         stint_color = compound_colors.get(compound, color)
 
-        # Separate fast laps from pit laps (inlap and outlap)
         flying_laps = stint_laps[
             stint_laps['PitInTime'].isna() &
             stint_laps['PitOutTime'].isna()
@@ -149,7 +146,6 @@ def chart_race_pace(session, driver):
             stint_laps['PitOutTime'].notna()
         ]
 
-        # Add flying laps as solid line
         if not flying_laps.empty:
             fig.add_trace(go.Scatter(
                 x=flying_laps['LapNumber'],
@@ -158,10 +154,9 @@ def chart_race_pace(session, driver):
                 name=f"Stint {int(stint)} - {compound}",
                 line=dict(color=stint_color, width=2),
                 marker=dict(size=4),
-                 hovertemplate='Lap %{x}<br>Time: %{y:.3f}s<extra></extra>'
+                hovertemplate='Lap %{x}<br>Time: %{y:.3f}s<extra></extra>'
             ))
 
-        # Add pit laps as dots only in grey so they're visible but marked
         if not pit_laps.empty:
             fig.add_trace(go.Scatter(
                 x=pit_laps['LapNumber'],
@@ -172,15 +167,15 @@ def chart_race_pace(session, driver):
                 hovertemplate='Lap %{x}<br>Pit lap: %{y:.3f}s<extra></extra>'
             ))
 
-        fig.update_layout(
-            title=f"{driver} Race Pace",
-            xaxis_title="Lap Number",
-            yaxis_title="Lap Time (seconds)",
-        )
+    fig.update_layout(
+        title=f"{driver} Race Pace",
+        xaxis_title="Lap Number",
+        yaxis_title="Lap Time (seconds)",
+    )
 
-        fig = apply_f1_theme(fig)
+    fig = apply_f1_theme(fig)
 
-        return fig
+    return fig
     
 
             
@@ -199,17 +194,13 @@ def chart_head_to_head(session, driver1, driver2):
     driver2 = three letter code 
     """
 
-    # Get combined laps for both drivers from analyze.py
     combined = get_head_to_head(session, driver1, driver2)
 
-    # Get each driver's team color
     color1 = get_driver_color(session, driver1)
     color2 = get_driver_color(session, driver2)
 
-    # if driver1 and driver2 are teammates and have the same color
     same_team = color1.lower() == color2.lower()
 
-    # Create blank figure
     fig = go.Figure()
 
     # driver 1
@@ -240,14 +231,12 @@ def chart_head_to_head(session, driver1, driver2):
         hovertemplate='Lap %{x}<br>Time: %{y:.3f}s<extra></extra>'
     ))
 
-    # tile and axis labels
     fig.update_layout(
         title=f"{driver1} vs {driver2} Race Pace",
         xaxis_title="Lap Number",
         yaxis_title="Lap Time (seconds)",
     )
 
-    # Apply dark F1 theme
     fig = apply_f1_theme(fig)
 
     return fig
@@ -263,14 +252,12 @@ def chart_consistency(session, drivers):
 
     fig = go.Figure()
 
-    # Track used colors for teammate detection
     used_colors = []
 
     for driver in drivers:
         score = get_consistency_score(session, driver)
         color = get_driver_color(session, driver)
 
-        # If color already used, use lower opacity for teammate
         if color.lower() in [c.lower() for c in used_colors]:
             opacity = 0.5
         else:
@@ -310,24 +297,19 @@ def chart_quali_comparison(session, driver1, driver2):
     driver2 = three letter code
     """
 
-    # Get best lap for each driver
     lap1 = get_quali_laps(session, driver1)
     lap2 = get_quali_laps(session, driver2)
 
-    # Get team colors
     color1 = get_driver_color(session, driver1)
     color2 = get_driver_color(session, driver2)
 
-    # Sector labels for x axis
     sectors = ['Sector 1', 'Sector 2', 'Sector 3']
 
-    # Sector times for each driver
     times1 = [lap1['S1'], lap1['S2'], lap1['S3']]
     times2 = [lap2['S1'], lap2['S2'], lap2['S3']]
 
     fig = go.Figure()
 
-  # Add bars for driver 1
     fig.add_trace(go.Bar(
         x=sectors,
         y=times1,
@@ -336,7 +318,6 @@ def chart_quali_comparison(session, driver1, driver2):
         hovertemplate='%{x}<br>Time: %{y:.3f}s<extra></extra>'
     ))
 
-       # Add bars for driver 2
     fig.add_trace(go.Bar(
         x=sectors,
         y=times2,
@@ -345,7 +326,6 @@ def chart_quali_comparison(session, driver1, driver2):
         hovertemplate='%{x}<br>Time: %{y:.3f}s<extra></extra>'
     ))
 
-    # barmode grouped means bars sit side by side, not stacked
     fig.update_layout(
         title=f"{driver1} vs {driver2} Qualifying Sectors",
         xaxis_title="Sector",
@@ -369,14 +349,12 @@ def chart_position_change(session, drivers):
 
     fig = go.Figure()
 
-    # Track which colors we've already used
     used_colors = []
 
     for driver in drivers:
         position_data = get_position_change(session, driver)
         color = get_driver_color(session, driver)
 
-        # If this color already used, dash the line
         if color.lower() in [c.lower() for c in used_colors]:
             dash_style = 'dash'
         else:
@@ -415,35 +393,27 @@ def chart_track_mistakes(session, driver):
     driver  = three letter driver code e.g. 'VER'
     """
 
-    # Get the driver's best lap
     laps = session.laps.pick_drivers(driver)
     best_lap = laps.pick_fastest()
 
-    # Get full telemetry including X Y coordinates
     telemetry = best_lap.get_telemetry().add_distance()
 
-    # Get mistakes for this driver
     mistakes = detect_mistakes(session, driver)
 
-    # Get circuit info for corner positions
     circuit_info = session.get_circuit_info()
 
-    # Create the figure with dark background
     fig, ax = plt.subplots(figsize=(12, 8))
     fig.patch.set_facecolor('#0a0a0a')
     ax.set_facecolor('#0a0a0a')
 
-    # Extract X, Y coordinates and speed
     x = telemetry['X'].values
     y = telemetry['Y'].values
     speed = telemetry['Speed'].values
     distance = telemetry['Distance'].values
 
-    # Create line segments between consecutive points
     points = np.array([x, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
 
-    # Color each segment by speed
     norm = plt.Normalize(speed.min(), speed.max())
     lc = mc.LineCollection(
         segments,
@@ -455,15 +425,12 @@ def chart_track_mistakes(session, driver):
     lc.set_array(speed[:-1])
     ax.add_collection(lc)
 
-    # Add colorbar to show speed scale
     cbar = plt.colorbar(lc, ax=ax)
     cbar.set_label('Speed (km/h)', color='white')
     cbar.ax.yaxis.set_tick_params(color='white')
     plt.setp(cbar.ax.yaxis.get_ticklabels(), color='white')
 
-    # Highlight mistake zones in red
     for mistake in mistakes:
-            # Find telemetry points within this mistake zone
             mask = (
                 (distance >= mistake['distance_start']) &
                 (distance <= mistake['distance_end'])
@@ -480,7 +447,6 @@ def chart_track_mistakes(session, driver):
                     alpha=0.8
                 )
 
-                # Add label at the worst point
                 worst_mask = np.abs(distance - mistake['worst_point']) < 20
                 if worst_mask.any():
                     label_x = x[worst_mask][0]
@@ -499,7 +465,6 @@ def chart_track_mistakes(session, driver):
                         zorder=5
                     )
             
-            # Clean up the axes
             ax.set_aspect('equal')
             ax.axis('off')
             ax.set_title(
@@ -509,7 +474,6 @@ def chart_track_mistakes(session, driver):
                 pad=20
             )
 
-            # Save as png
             plt.tight_layout()
             plt.savefig(
                 f"{driver}_mistakes.png",

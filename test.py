@@ -212,10 +212,54 @@ for i, mistake in enumerate(mistakes):
     print()
 """
 
-
+"""
 from fetch import get_session
 from charts import chart_track_mistakes
 
 session = get_session(2026, 'British Grand Prix', 'Q')
 
 chart_track_mistakes(session, 'NOR')
+"""
+
+"""
+from fetch import get_session
+from charts import chart_race_pace, chart_head_to_head, chart_consistency, chart_position_change
+
+session = get_session(2026, 'British Grand Prix', 'R')
+
+fig1 = chart_race_pace(session, 'NOR')
+fig1.show()
+
+fig2 = chart_head_to_head(session, 'NOR', 'PIA')
+fig2.show()
+
+fig3 = chart_consistency(session, ['NOR', 'PIA', 'VER', 'HAD'])
+fig3.show()
+
+fig4 = chart_position_change(session, ['NOR', 'PIA', 'VER', 'HAD'])
+fig4.show()
+"""
+
+"""
+from fetch import get_session
+from charts import chart_race_pace, chart_head_to_head, chart_consistency, chart_position_change
+
+session = get_session(2026, 'British Grand Prix', 'R')
+
+fig1 = chart_race_pace(session, 'NOR')
+fig1.show()
+"""
+
+from fetch import get_session
+from analyze import get_perfect_lap
+
+session = get_session(2026, 'British Grand Prix', 'Q')
+
+result = get_perfect_lap(session, 'NOR')
+
+print(f"Best S1: {result['best_s1']}s (Lap {result['best_s1_lap']})")
+print(f"Best S2: {result['best_s2']}s (Lap {result['best_s2_lap']})")
+print(f"Best S3: {result['best_s3']}s (Lap {result['best_s3_lap']})")
+print(f"Perfect lap: {result['perfect_time']}s")
+print(f"Best actual: {result['best_actual']}s")
+print(f"Time gain: {result['time_gain']}s")

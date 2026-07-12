@@ -16,7 +16,7 @@ COLORS = {
     'grid': '#1a1a1a',
     'border': '#2a2a2a',
     'red': '#E8002D',
-    'green': '#00D632',
+    'green': '#2ECC71',
     'yellow': '#FFD700',
     'purple': '#9B59B6',
     'cyan': '#00D4FF',
@@ -37,14 +37,6 @@ DEFAULT_COLORS = [
 
 
 def get_driver_color(session, driver):
-    """
-    Gets the official team color for a driver from the session data
-    Falls back to a default color if not found
-
-    session = session object from get_session()
-    driver = three letter driver code
-    """
-
     try:
         driver_info = session.get_driver(driver)
         color = driver_info['TeamColor']
@@ -55,12 +47,7 @@ def get_driver_color(session, driver):
         return DEFAULT_COLORS[0]
     
 def apply_f1_theme(fig):
-    """
-    Applies the bold F1 theme to any plotly figure.
-    Call this on every chart before returning it.
-
-    fig = any plotly figure object
-    """
+    
 
     fig.update_layout(
         plot_bgcolor=COLORS['background'],
@@ -102,14 +89,6 @@ def apply_f1_theme(fig):
     return fig
 
 def chart_race_pace(session, driver):
-    """
-    Creates a line  chart of lap times across the race for one driver.
-    Each stint colored by tire compound, pit laps shown separately.
-
-    session = session object from get.session()
-    driver  = three letter driver code
-    """
-
     laps = get_driver_laps(session, driver)
     laps = laps.copy()
     laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
@@ -185,15 +164,7 @@ def chart_race_pace(session, driver):
 
 
 def chart_head_to_head(session, driver1, driver2):
-    """
-    Creates a line chart comparing laptimes between two drivers
-    Each driver gets their own colored line
-    
-    session = session object from get_session()
-    driver1 = three letter code
-    driver2 = three letter code 
-    """
-
+  
     combined = get_head_to_head(session, driver1, driver2)
 
     color1 = get_driver_color(session, driver1)
@@ -242,14 +213,7 @@ def chart_head_to_head(session, driver1, driver2):
     return fig
 
 def chart_consistency(session, drivers):
-    """
-    Creates a bar chart comparing consistency scores for multiple drivers.
-    Lower bar = more consistent driver.
-
-    session = session object from get_session()
-    drivers = list of driver codes e.g. ['VER', 'LEC', 'HAM']
-    """
-
+    
     fig = go.Figure()
 
     used_colors = []
@@ -283,20 +247,18 @@ def chart_consistency(session, drivers):
         yaxis_title="Std Deviation (lower = more consistent)",
     )
 
+    
+    
     fig = apply_f1_theme(fig)
 
     return fig
 
+
+
+
+
 def chart_quali_comparison(session, driver1, driver2):  
-    """
-    Compares best qualifying lap sector times between two drivers.
-    Shows S1, S2, S3 times side by side as grouped bars
-
-    session = session object from get_session()
-    driver1 = three letter code
-    driver2 = three letter code
-    """
-
+  
     lap1 = get_quali_laps(session, driver1)
     lap2 = get_quali_laps(session, driver2)
 
@@ -338,15 +300,11 @@ def chart_quali_comparison(session, driver1, driver2):
     return fig
 
 
+
+
+
 def chart_position_change(session, drivers):
-    """
-    Shows position change across the race for multiple drivers.
-    Lower position number = higher up the order.
-
-    session = session object from get_session()
-    drivers = list of driver codes e.g. ['VER', 'LEC', 'HAM']
-    """
-
+  
     fig = go.Figure()
 
     used_colors = []
@@ -357,11 +315,15 @@ def chart_position_change(session, drivers):
 
         if color.lower() in [c.lower() for c in used_colors]:
             dash_style = 'dash'
+       
+       
         else:
             dash_style = 'solid'
 
         used_colors.append(color)
 
+       
+       
         fig.add_trace(go.Scatter(
             x=position_data['LapNumber'],
             y=position_data['Position'],
@@ -371,6 +333,7 @@ def chart_position_change(session, drivers):
             hovertemplate='Lap %{x}<br>Position: P%{y}<extra></extra>'
         ))
 
+    
     fig.update_layout(
         title="Position Changes During Race",
         xaxis_title="Lap Number",
@@ -380,7 +343,10 @@ def chart_position_change(session, drivers):
 
     fig = apply_f1_theme(fig)
 
+    
+    
     return fig
+
 
 
 
@@ -461,9 +427,13 @@ def chart_track_mistakes(session, driver):
                             boxstyle='square,pad=0.3',
                             facecolor=COLORS['red'],
                             alpha=1.0
+                       
                         ),
                         zorder=5
+                  
                     )
+            
+            
             
             ax.set_aspect('equal')
             ax.axis('off')
@@ -474,6 +444,8 @@ def chart_track_mistakes(session, driver):
                 pad=20
             )
 
+           
+           
             plt.tight_layout()
             plt.savefig(
                 f"{driver}_mistakes.png",
@@ -483,7 +455,60 @@ def chart_track_mistakes(session, driver):
             )
             plt.show()
 
+           
+           
             return f"{driver}_mistakes.png"
+    
+
+
+
+def  chart_perfect_lap(session, driver):
+
+
+    from analyze import get_perfect_lap, get_quali_laps
+
+    result = get_perfect_lap(session, driver)
+    best_lap = get_quali_laps(session, driver)
+    color = get_driver_color(session, driver)
+    sectors = ['Sector 1', 'Sector 2', 'Sector 3']
+    perfect_times = [result['best_s1'], result['best_s2'], result['best_s3']]
+    actual_times = [best_lap['S1'], best_lap['S2'], best_lap['S3']]
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=sectors,
+        y=perfect_times,
+        name='Perfect Lap',
+        marker=dict(color=COLORS['green']),
+        hovertemplate='%{x}<br>Perfect: %{y:.3f}s<extra></extra>'
+    ))
+    fig.add_trace(go.Bar(
+        x=sectors,
+        y=actual_times,
+        name='Best Actual Lap',
+        marker=dict(color=color),
+        hovertemplate='%{x}<br>Actual: %{y:.3f}s<extra></extra>'
+    ))
+    fig.update_layout(
+        title=f"{driver} Perfect Lap Analysis",
+        xaxis_title="Sector",
+        yaxis_title="time (seconds)",
+        barmode='group',
+        annotations=[
+            dict(
+                x=0.5,
+                y=1.05,
+                xref='paper',
+                yref='paper',
+                text=f"Perfect: {result['perfect_time']}s | Best: {result['best_actual']}s | Gain: {result['time_gain']}s",
+                showarrow=False,
+                font=dict(size=12, color=COLORS['text_secondary'])
+            )
+        ]
+    )
+    fig = apply_f1_theme(fig)
+    return fig
+
 
 
                         

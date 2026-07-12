@@ -2,68 +2,46 @@ import pandas as pd
 import numpy as np
 from fetch import get_session, get_driver_laps
 
+
+
+
 def get_clean_laps(session, driver):
-    """
-    Returns only clean, accurate laps for a driver.
-    Filters out safety car laps, deleted laps and inaccurate laps.
-
-    session = session object from get_session()
-    driver = three letter driver code e.g. 'VER'
-    """
-    # Get all laps for this driver
     laps = get_driver_laps(session, driver)
-
-    # Filter 1 - only keep laps FastF1 considers accurate
     laps = laps[laps['IsAccurate'] == True]
-
-    # Filter 2 - remove deleted laps (track limits etc)
     laps = laps[laps['Deleted'] == False]
-
-    # Filter 3 - only keep green flag laps
-    # TrackStatus '1' means green flag
-    # anything else means SC, VSC, red flag etc
     laps = laps[laps['TrackStatus'] == '1']
-
-    # Filter 4 - remove laps with no lap time recorded
     laps = laps.dropna(subset=['LapTime'])
 
     return laps
 
+
+
+
+
 def get_race_pace(session, driver):
-    """
-    Calculates average lap time per stint for a driver
-    Returns a DataFrame with stint number, compound and avg lap time
-
-    session = session object from get_session()
-    driver  = three letter driver code e.g. 'VER'
-    """
     laps = get_clean_laps(session, driver)
-
     laps = laps.copy()
     laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
-
     pace = laps.groupby('Stint').agg(
         AvgLapTime=('LapTimeSeconds', 'mean'),
         Compound=('Compound', 'first'),
         LapCount=('LapNumber', 'count')
     ).reset_index()
-
     return pace
 
-def get_head_to_head(session, driver1, driver2):
-    """
-    Compares lap by lap times between two drivers.
-    Returns both drivers' clean laps merged together.
 
-    session = session object from get_session()
-    driver1 = three letter code for first driver e.g. 'VER'
-    driver2 = three letter code for second driver e.g. 'ALO'
-    """
+
+
+def get_head_to_head(session, driver1, driver2):
+    
+    
+    
     laps1 = get_clean_laps(session, driver1)
     laps2 = get_clean_laps(session, driver2)
 
     laps1 = laps1.copy()
     laps2 = laps2.copy()
+    
     laps1['LapTimeSeconds'] = laps1['LapTime'].dt.total_seconds()
     laps2['LapTimeSeconds'] = laps2['LapTime'].dt.total_seconds()
 
@@ -74,16 +52,12 @@ def get_head_to_head(session, driver1, driver2):
 
     return combined
 
-def get_consistency_score(session, driver):
-    """
-    Calculates how consistent a driver's lap times were.
-    Lower score = more consistent.
-    Uses standard deviation of clean lap times
-    
-    session = session object from get_session()
-    driver  = three letter driver code
-    """
 
+
+
+def get_consistency_score(session, driver):
+    
+    
     laps = get_clean_laps(session, driver)
 
     laps = laps.copy()
@@ -93,23 +67,20 @@ def get_consistency_score(session, driver):
 
     return round(score, 3)
 
-def get_h2h_summary(session, driver1, driver2):
-    """
-    Returns an overall race pace summary between two drivers
-    Shows average lap time, difference and who was faster
 
-    session = session object from get_session()
-    driver1 = three letter code
-    driver2 = three letter code
-    """
+
+
+
+def get_h2h_summary(session, driver1, driver2):
+    
+    
+    
     laps1 = get_clean_laps(session, driver1)
     laps2 = get_clean_laps(session, driver2)
-
     laps1 = laps1.copy()
     laps2 = laps2.copy()
     laps1['LapTimeSeconds'] = laps1['LapTime'].dt.total_seconds()
     laps2['LapTimeSeconds'] = laps2['LapTime'].dt.total_seconds()
-
     avg1 = laps1['LapTimeSeconds'].mean()
     avg2 = laps2['LapTimeSeconds'].mean()
 
@@ -125,6 +96,11 @@ def get_h2h_summary(session, driver1, driver2):
     }
     
     return summary
+
+
+
+
+
 
 def get_quali_laps(session, driver):
     """
@@ -149,14 +125,12 @@ def get_quali_laps(session, driver):
 
     return best_lap    
 
-def get_position_change(session, driver):
-    """
-    Returns lap by kao position data for a driver.
-    Shows how they moved through the field during the race
 
-    session = session object from get_session()
-    driver  = three letter driver code
-    """
+
+
+def get_position_change(session, driver):
+
+
 
     laps = get_driver_laps(session, driver)
     laps = laps.copy()
@@ -181,12 +155,10 @@ from scipy import interpolate
 
 
 def get_telemetry_for_lap(lap):
-    """
-    Gets telemetry data for a specific lap object.
-    Returns telemetry with Distance, Speed, Throttle, Brake, nGear.
+    
 
-    lap = a single lap row  from FastF1 laps DataFrame
-    """
+
+
     telemetry = lap.get_telemetry()
 
     telemetry = telemetry[['Distance', 'Speed', 'Throttle', 'Brake', 'nGear']].copy()
@@ -195,14 +167,11 @@ def get_telemetry_for_lap(lap):
 
     return telemetry
 
-def interpolate_telemetry(telemetry, distance_grid):
-    """
-    Interpolates telemetry data onto a common distance grid.
-    This lets us compare two laps at the exact track positions.
 
-    telemetry     = telemetry DataFrame from get_telemetry_for_lap()
-    distance_grid = array of evenly spaced distance points to interpolate into
-    """
+
+def interpolate_telemetry(telemetry, distance_grid):
+   
+   
 
     speed_interp = interpolate.interp1d(
         telemetry['Distance'],
@@ -244,37 +213,23 @@ def interpolate_telemetry(telemetry, distance_grid):
     return result
 
 def get_corner_for_distance(circuit_info, distance):
-    """
-    Finds the nearest corner number for a given distance on track.
-
-    circuit_info = session.get_circuit_info()
-    distance     = distance along the track in meters
-    """
-
+ 
     corners = circuit_info.corners
 
     corners = corners.copy()
     corners['diff'] = abs(corners['Distance'] - distance)
-
     nearest = corners.loc[corners['diff'].idxmin()]
 
     turn_number = int(nearest['Number'])
     corner_distance = round(nearest['Distance'], 1)
-
     return turn_number, corner_distance
 
 
 
 
 def detect_mistakes(session, driver, lap_number=None):
-    """
-    Detects mistakes in a driver's lap by comparing it to their best lap.
-    Returns a list of mistakes with location and time lost.
+   
 
-    session    = session object from get_session()
-    driver     = three letter driver code e.g. 'VER'
-    lap_number = specific lap to analyze, if None uses second best lap
-    """
 
     laps = session.laps.pick_drivers(driver)
 
@@ -359,13 +314,8 @@ def detect_mistakes(session, driver, lap_number=None):
 
     
 def get_perfect_lap(session, driver):
-    """
-    Builds the theoretical perfect lap from a driver's best sectors.
-    Returns best S1, S2, S3 and the combined perfect lap time.
+  
 
-    session = session object 
-    driver  = three letter driver code
-    """
 
     laps = get_driver_laps(session, driver)
     laps = laps.copy()
@@ -401,6 +351,6 @@ def get_perfect_lap(session, driver):
         'perfect_time': round(perfect_time, 3),
         'best_actual': round(best_actual, 3),
         'time_gain': time_gain
-    }   
+    }
 
 

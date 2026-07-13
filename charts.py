@@ -512,6 +512,50 @@ def  chart_perfect_lap(session, driver):
 
 
                         
+def chart_quali_improvement(session, drivers):
+    from analyze import get_quali_improvement
+
+    fig = go.Figure()
+    used_colors = []
+
+    for driver in drivers:
+        result = get_quali_improvement(session, driver)
+        if result is None:
+            continue
+
+        times = result['times']
+        color = get_driver_color(session, driver)
+        if color.lower() in [c.lower() for c in used_colors]:
+            dash_style = 'dash'
+        else:
+            dash_style = 'solid'
+        used_colors.append(color)
+
+        x_vals = []
+        y_vals = []
+        for segment in ['Q1', 'Q2', 'Q3']:
+            if times[segment] is not None:
+                x_vals.append(segment)
+                y_vals.append(times[segment])
+
+        fig.add_trace(go.Scatter(
+            x=x_vals,
+            y=y_vals,
+            mode='lines+markers',
+            name=driver,
+            line=dict(color=color, width=2, dash=dash_style),
+            marker=dict(size=8),
+            hovertemplate='%{x}: %{y:.3f}s<extra></extra>'
+        ))
+
+    fig.update_layout(
+        title="Qualifying Progression Q1 - Q2 - Q3",
+        xaxis_title="Segment",
+        yaxis_title="Best Lap Time (seconds)",
+    )
+    fig = apply_f1_theme(fig)
+
+    return fig
 
 
 

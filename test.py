@@ -259,3 +259,43 @@ from charts import chart_track_mistakes
 session = get_session(2026, 'British Grand Prix', 'Q')
 chart_track_mistakes(session, 'NOR')
 """
+
+"""
+from fetch import get_session
+from analyze import get_quali_improvement
+
+session = get_session(2026, 'British Grand Prix', 'Q')
+result = get_quali_improvement(session, 'NOR')
+print(f"Q1 best: {result['times']['Q1']}s")
+print(f"Q2 best: {result['times']['Q2']}s")
+print(f"Q3 best: {result['times']['Q3']}s")
+print(f"Q1 to Q2 improvement: {result['improvements']['Q1_to_Q2']}s")
+print(f"Q2 to Q3 improvement: {result['improvements']['Q2_to_Q3']}s")
+print(f"Q1 to Q3 total improvement: {result['improvements']['Q1_to_Q3']}s")
+"""
+
+
+"""
+from fetch import get_session
+session = get_session(2026, 'British Grand Prix', 'Q')
+laps = session.laps.pick_drivers('NOR')
+print(laps.columns.tolist())
+"""
+
+
+
+
+
+
+"""
+from fetch import get_session
+session = get_session(2026, 'British Grand Prix', 'Q')
+print(session.results[['Abbreviation', 'Q1', 'Q2', 'Q3']])
+"""
+
+
+from fetch import get_session
+from charts import chart_quali_improvement
+session = get_session(2026, 'British Grand Prix', 'Q')
+fig = chart_quali_improvement(session, ['NOR', 'VER', 'LEC', 'HAM', 'ANT'])
+fig.show()

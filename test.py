@@ -294,8 +294,67 @@ print(session.results[['Abbreviation', 'Q1', 'Q2', 'Q3']])
 """
 
 
+
+"""
 from fetch import get_session
 from charts import chart_quali_improvement
 session = get_session(2026, 'British Grand Prix', 'Q')
 fig = chart_quali_improvement(session, ['NOR', 'VER', 'LEC', 'HAM', 'ANT'])
+fig.show()
+""" 
+  
+
+"""
+from fetch import get_session
+from analyze import get_circuit_dna
+session = get_session(2026, 'British Grand Prix', 'Q')
+dna = get_circuit_dna(session)
+
+print(f"Circuit: {dna['circuit']} {dna['year']}")
+print(f"Full throttle: {dna['throttle_pct']}%")
+print(f"Braking: {dna['braking_pct']}%")
+print(f"Top speed: {dna['top_speed']} km/h")
+print(f"Avg corner speed: {dna['avg_corner_speed']} km/h")
+print(f"Low speed corners: {dna['low_speed_pct']}%")
+print(f"High speed cornering: {dna['high_speed_pct']}%")
+"""
+
+
+
+"""
+from fetch import get_session
+from analyze import get_circuit_dna
+
+session1 = get_session(2026, 'British Grand Prix', 'Q')
+dna1 = get_circuit_dna(session1)
+session2 = get_session(2026, 'Monaco Grand Prix', 'Q')
+dna2 = get_circuit_dna(session2)
+
+print("SILVERSTONE vs MONACO")
+print(f"Full throttle:      {dna1['throttle_pct']}% vs {dna2['throttle_pct']}%")
+print(f"Braking:            {dna1['braking_pct']}% vs {dna2['braking_pct']}%")
+print(f"Top speed:          {dna1['top_speed']} vs {dna2['top_speed']} km/h")
+print(f"Avg corner speed:   {dna1['avg_corner_speed']} vs {dna2['avg_corner_speed']} km/h")
+print(f"Low speed corners:  {dna1['low_speed_pct']}% vs {dna2['low_speed_pct']}%")
+print(f"High speed:         {dna1['high_speed_pct']}% vs {dna2['high_speed_pct']}%")
+"""
+
+
+
+"""
+from fetch import get_session
+from charts import chart_circuit_dna
+session = get_session(2026, 'British Grand Prix', 'Q')
+
+fig = chart_circuit_dna(session)
+fig.show()
+"""
+
+
+
+from fetch import get_session
+from charts import chart_circuit_dna
+session1 = get_session(2026, 'British Grand Prix', 'Q')
+session2 = get_session(2026, 'Monaco Grand Prix', 'Q')
+fig = chart_circuit_dna([session1, session2])
 fig.show()

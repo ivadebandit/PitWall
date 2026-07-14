@@ -562,3 +562,67 @@ def chart_quali_improvement(session, drivers):
 
 
 
+
+
+def chart_circuit_dna(sessions):
+    from analyze import get_circuit_dna
+
+    accent_colors = [
+        COLORS['red'], COLORS['cyan'], COLORS['yellow'],
+        COLORS['green'], COLORS['purple'] ]
+
+    fig = go.Figure()
+    for i, session in enumerate(sessions):
+        dna = get_circuit_dna(session)
+        color = accent_colors[i % len(accent_colors)]
+
+        metrics = {
+            'Full Throttle %': (dna['throttle_pct'], 100),
+            'Braking %': (dna['braking_pct'], 40),
+            'Top Speed': (dna['top_speed'], 380),
+            'Corner Speed': (dna['avg_corner_speed'], 200),
+            'High Speed %': (dna['high_speed_pct'], 30),
+            'Low Speed %': (dna['low_speed_pct'], 50), }
+
+        categories = list(metrics.keys())
+        values = [round((v / max_v) * 100, 1) for v, max_v in metrics.values()]
+        values_closed = values + [values[0]]
+        categories_closed = categories + [categories[0]]
+        r = int(color[1:3], 16)
+        g = int(color[3:5], 16)
+        b = int(color[5:7], 16)
+
+        fig.add_trace(go.Scatterpolar(
+            r=values_closed,
+            theta=categories_closed,
+            fill='toself',
+            fillcolor=f'rgba({r},{g},{b},0.15)',
+            line=dict(color=color, width=2),
+            name=f"{dna['circuit']} {dna['year']}"  ))
+
+    fig.update_layout(
+        title="Circuit DNA Comparison",
+        polar=dict(
+            bgcolor=COLORS['paper'],
+            radialaxis=dict(
+                visible=True,
+                range=[0, 100],
+                gridcolor=COLORS['grid'],
+                linecolor=COLORS['grid'],
+                tickfont=dict(color=COLORS['text_secondary'], size=10) ),
+            angularaxis=dict(
+                gridcolor=COLORS['grid'],
+                linecolor=COLORS['grid'],
+                tickfont=dict(color=COLORS['text'], size=13) )),
+        showlegend=True,
+        height=600,
+        width=700 )
+
+    fig = apply_f1_theme(fig)
+    return fig
+
+
+
+
+
+

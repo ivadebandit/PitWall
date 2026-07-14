@@ -383,3 +383,53 @@ def get_quali_improvement(session, driver):
     return {'times': results,
         'improvements': improvements,
         'driver': driver }
+
+
+
+
+
+
+
+
+def get_circuit_dna(session):
+    fastest_lap = session.laps.pick_fastest()
+    telemetry = fastest_lap.get_telemetry()
+
+   
+    full_throttle = (telemetry['Throttle'] == 100).sum() # high power circuit if full throttle is used many times throughout a lap
+    total_points = len(telemetry)
+    throttle_pct = round((full_throttle / total_points) * 100, 1)
+
+    braking = (telemetry['Brake'] == True).sum() # how much braking is required during a lap
+    braking_pct = round((braking / total_points) * 100, 1)
+
+    top_speed = round(telemetry['Speed'].max(), 1) # maximum top speed
+
+    cornering = telemetry[
+        (telemetry['Throttle'] < 100) &
+        (telemetry['Brake'] == False) # avg corner speed, tells if most corners are fast/slow 
+    ]
+    if len(cornering) > 0:
+        avg_corner_speed = round(cornering['Speed'].mean(), 1)
+    else:
+        avg_corner_speed = 0
+
+    low_speed = (telemetry['Speed'] < 120).sum() # low speed corners percentage (below 120kmh)
+    low_speed_pct = round((low_speed / total_points) * 100, 1) # if its high its it mainly has slow corners
+
+    high_speed_cornering = telemetry[ # its a high df cicuit if it hsa many fast/high speed corners
+        (telemetry['Speed'] > 200) &
+        (telemetry['Throttle'] < 100)
+    ]
+    high_speed_pct = round((len(high_speed_cornering) / total_points) * 100, 1)
+
+    return {
+        'throttle_pct': throttle_pct,
+        'braking_pct': braking_pct,
+        'top_speed': top_speed,
+        'avg_corner_speed': avg_corner_speed,
+        'low_speed_pct': low_speed_pct,
+        'high_speed_pct': high_speed_pct,
+        'circuit': session.event['EventName'],
+        'year': session.event['EventDate'].year
+    }

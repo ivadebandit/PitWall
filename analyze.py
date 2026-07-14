@@ -430,6 +430,39 @@ def get_circuit_dna(session):
         'avg_corner_speed': avg_corner_speed,
         'low_speed_pct': low_speed_pct,
         'high_speed_pct': high_speed_pct,
-        'circuit': session.event['EventName'],
-        'year': session.event['EventDate'].year
-    }
+        'circuit': session.event['EventName']  }
+
+
+
+
+def classify_circuit(dna):
+    throttle = dna['throttle_pct']
+    braking = dna['braking_pct']
+    corner_speed = dna['avg_corner_speed']
+    low_speed = dna['low_speed_pct']
+    top_speed = dna['top_speed']
+    high_speed = dna['high_speed_pct']
+
+    if throttle > 68 and top_speed > 320:
+        label = "Power Track" # lots of full throttle and high top speed like monza
+        description = "Long straights and high top speeds. Low drag setups and raw engine power are rewarded."
+    elif low_speed > 20 and braking > 20:
+        label = "High Downforce" # lots of slow corners and that requires high df like monaco
+        description = "Tight corners and heavy braking demand maximum downforce and mechanical grip."
+
+    elif corner_speed > 155 and braking < 12 and high_speed > 8:
+        label = "High Speed" # fast corners and less breaking like jeddah
+        description = "Fast flowing corners reward aerodynamic efficiency and driver commitment."
+
+    elif braking > 18 and throttle < 55:
+        label = "Stop/Go" # lots of breaking 
+        description = "Frequent hard braking zones followed by acceleration. Brakes and traction are key."
+    else:
+        label = "Balanced"
+        description = "No single characteristic dominates. A well rounded setup is needed."
+
+    return {
+        'label': label,
+        'description': description,
+        'circuit': dna['circuit']
+    }  

@@ -358,3 +358,4 @@ session1 = get_session(2026, 'British Grand Prix', 'Q')
 session2 = get_session(2026, 'Monaco Grand Prix', 'Q')
 fig = chart_circuit_dna([session1, session2])
 fig.show()
+        

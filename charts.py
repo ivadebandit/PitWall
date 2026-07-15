@@ -27,6 +27,29 @@ COLORS = {
     'wet': '#00D4FF',
 }
 
+
+TEAM_COLORS = {
+    'Mercedes': '#00D2BE',
+    'Ferrari': '#E8002D',
+    'Red Bull Racing': '#3671C6',
+    'Red Bull': '#3671C6',
+    'McLaren': '#FF8000',
+    'Aston Martin': '#358C75',
+    'Racing Point': '#F596C8',
+    'Force India': '#FF80C7',
+    'Alpine': '#FF87BC',
+    'Renault': '#FFF500',
+    'Williams': '#64C4FF',
+    'Racing Bulls': '#6692FF',
+    'AlphaTauri': '#5C37A3',
+    'Toro Rosso': '#1E3D61',
+    'Haas F1 Team': '#B6BABD',
+    'Haas': '#B6BABD',
+    'Kick Sauber': '#52E252',
+    'Alfa Romeo': '#C92D4B',
+    'Sauber': '#C92D4B',
+}
+
 DEFAULT_COLORS = [
     '#E8002D', '#00D632', '#FFD700', '#00D4FF', '#9B59B6',
     '#FF6B6B', '#51CF66', '#FCC419', '#339AF0', '#CC5DE8'
@@ -174,7 +197,6 @@ def chart_head_to_head(session, driver1, driver2):
 
     fig = go.Figure()
 
-    # driver 1
     d1_laps = combined[combined['Driver'] == driver1]
     fig.add_trace(go.Scatter(
         x=d1_laps['LapNumber'],
@@ -186,7 +208,6 @@ def chart_head_to_head(session, driver1, driver2):
         hovertemplate='Lap %{x}<br>Time: %{y:.3f}s<extra></extra>'
     ))
 
-    # driver 2
     d2_laps = combined[combined['Driver'] == driver2]
     fig.add_trace(go.Scatter(
         x=d2_laps['LapNumber'],
@@ -621,6 +642,49 @@ def chart_circuit_dna(sessions):
     fig = apply_f1_theme(fig)
     return fig
 
+
+
+
+
+def chart_team_circuit_affinity(affinity_data):
+    fig = go.Figure()
+
+    circuit_types = list(affinity_data.keys())
+    all_teams = set()
+    for teams in affinity_data.values():
+        all_teams.update(list(teams.keys())[:5])
+    all_teams = list(all_teams)
+
+    team_colors = [
+        COLORS['red'], COLORS['cyan'], COLORS['yellow'],
+        COLORS['green'], COLORS['purple'], '#FF6B6B',
+        '#51CF66', '#FCC419', '#339AF0', '#CC5DE8'  ]
+
+    for i, team in enumerate(all_teams):
+        positions = []
+        for circuit_type in circuit_types:
+            pos = affinity_data[circuit_type].get(team, None)
+            positions.append(pos)
+
+        color = TEAM_COLORS.get(team, team_colors[i % len(team_colors)])
+
+        fig.add_trace(go.Bar(
+            name=team,
+            x=circuit_types,
+            y=positions,
+            marker=dict(color=color),
+            hovertemplate=f'{team}<br>%{{x}}: P%{{y:.1f}}<extra></extra>'
+        ))
+    fig.update_layout(
+        title="Team Performance by Circuit Type",
+        xaxis_title="Circuit Type",
+        yaxis_title="Average Qualifying Position",
+        barmode='group',
+        yaxis=dict(autorange='reversed')   )
+    all_teams = list(dict.fromkeys(all_teams))
+    fig = apply_f1_theme(fig)
+
+    return fig
 
 
 

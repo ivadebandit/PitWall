@@ -350,7 +350,7 @@ fig = chart_circuit_dna(session)
 fig.show()
 """
 
-
+"""
 
 from fetch import get_session
 from charts import chart_circuit_dna
@@ -358,4 +358,75 @@ session1 = get_session(2026, 'British Grand Prix', 'Q')
 session2 = get_session(2026, 'Monaco Grand Prix', 'Q')
 fig = chart_circuit_dna([session1, session2])
 fig.show()
-        
+"""
+
+"""
+from fetch import get_session
+from analyze import get_circuit_dna, classify_circuit
+
+session1 = get_session(2026, 'British Grand Prix', 'Q')
+session2 = get_session(2026, 'Monaco Grand Prix', 'Q')
+dna1 = get_circuit_dna(session1)
+dna2 = get_circuit_dna(session2)
+result1 = classify_circuit(dna1)
+result2 = classify_circuit(dna2)
+print(f"{result1['circuit']}: {result1['label']}")
+print(f"  {result1['description']}")
+print()
+print(f"{result2['circuit']}: {result2['label']}")
+print(f"  {result2['description']}") """
+
+"""
+from fetch import get_session
+from analyze import get_circuit_dna, classify_circuit
+
+circuits = [
+    ('British Grand Prix', 'Silverstone'),
+    ('Monaco Grand Prix', 'Monaco'),
+    ('Italian Grand Prix', 'Monza'),
+    ('Japanese Grand Prix', 'Suzuka'),
+    ('Canadian Grand Prix', 'Montreal'),]
+for event, name in circuits:
+    session = get_session(2026, event, 'Q')
+    dna = get_circuit_dna(session)
+    result = classify_circuit(dna)
+    print(f"{name}: {result['label']}") """
+
+
+"""
+from fetch import get_session
+from analyze import get_circuit_dna, classify_circuit
+session = get_session(2026, 'Italian Grand Prix', 'Q')
+dna = get_circuit_dna(session)
+result = classify_circuit(dna)
+print(f"Monza: {result['label']}") """
+
+
+
+
+from fetch import get_session
+from analyze import get_circuit_dna, classify_circuit
+"""
+circuits = [
+    ('British Grand Prix', 'Silverstone'),
+    ('Monaco Grand Prix', 'Monaco'),
+    ('Canadian Grand Prix', 'Montreal'),
+    ('Australian Grand Prix', 'Melbourne'),
+    ('Japanese Grand Prix', 'Suzuka'),
+]
+
+for event, name in circuits:
+    try:
+        session = get_session(2026, event, 'Q')
+        dna = get_circuit_dna(session)
+        result = classify_circuit(dna)
+        print(f"{name}: {result['label']}")
+    except Exception as e:
+        print(f"{name}: Error - {e}")
+        """
+
+
+
+session = get_session(2026, 'Japanese Grand Prix', 'Q')
+dna = get_circuit_dna(session)
+print(dna)

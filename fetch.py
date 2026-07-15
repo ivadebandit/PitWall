@@ -8,9 +8,9 @@ def get_session(year, location, session_type):
 def get_driver_laps(session, driver):
     laps =  session.laps.pick_drivers(driver)
     return laps
-
-
-
-
+ 
+  
+ 
+ 
 
 

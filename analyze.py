@@ -443,12 +443,12 @@ def classify_circuit(dna):
     top_speed = dna['top_speed']
     high_speed = dna['high_speed_pct']
 
-    if throttle > 60 and top_speed > 315:
-        label = "Power Track"
-        description = "Long straights and high top speeds. Low drag setups and raw engine power are needed."
-    elif corner_speed > 170 and high_speed > 12:
+    if corner_speed > 170 and high_speed > 12:
         label = "High Speed"
         description = "Fast flowing corners require aero efficiency and driver commitment."
+    elif throttle > 60 and top_speed > 315:
+        label = "Power Track"
+        description = "Long straights and high top speeds. Low drag setups and raw engine power are needed."
     elif low_speed > 15:
         label = "High Downforce"
         description = "Tight corners and heavy braking require max downforce and mechanical grip."

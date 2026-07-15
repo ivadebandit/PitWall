@@ -403,9 +403,10 @@ print(f"Monza: {result['label']}") """
 
 
 
-
+"""
 from fetch import get_session
 from analyze import get_circuit_dna, classify_circuit
+"""
 """
 circuits = [
     ('British Grand Prix', 'Silverstone'),
@@ -426,7 +427,31 @@ for event, name in circuits:
         """
 
 
-
+"""
 session = get_session(2026, 'Japanese Grand Prix', 'Q')
 dna = get_circuit_dna(session)
-print(dna)
+print(dna)"""
+
+
+
+from fetch import get_session
+from analyze import get_circuit_dna, classify_circuit
+
+circuits = [
+    ('British Grand Prix', 'Silverstone'),
+    ('Monaco Grand Prix', 'Monaco'),
+    ('Canadian Grand Prix', 'Montreal'),
+    ('Australian Grand Prix', 'Melbourne'),
+    ('Japanese Grand Prix', 'Suzuka'),
+    ('Miami Grand Prix', 'Miami'),
+    ('Barcelona Grand Prix', 'Barcelona'),
+]
+
+for event, name in circuits:
+    try:
+        session = get_session(2026, event, 'Q')
+        dna = get_circuit_dna(session)
+        result = classify_circuit(dna)
+        print(f"{name}: {result['label']} (throttle:{dna['throttle_pct']}% corner:{dna['avg_corner_speed']}km/h low:{dna['low_speed_pct']}%)")
+    except Exception as e:
+        print(f"{name}: Error - {e}")   

@@ -689,4 +689,49 @@ def chart_team_circuit_affinity(affinity_data):
 
 
 
+def chart_driver_circuit_affinity(affinity_data, session):
+    fig = go.Figure()
+    circuit_types = list(affinity_data.keys())
 
+    all_drivers = {}
+    for drivers in affinity_data.values():
+        for driver, pos in list(drivers.items())[:5]:
+            if driver not in all_drivers:
+                all_drivers[driver] = []
+            all_drivers[driver].append(pos)
+    top_drivers = sorted(all_drivers.keys(),
+        key=lambda d: sum(all_drivers[d]) / len(all_drivers[d]))[:6]
+
+    used_colors = []
+
+    for driver in top_drivers:
+        positions = []
+        for circuit_type in circuit_types:
+            pos = affinity_data[circuit_type].get(driver, None)
+            positions.append(pos)
+
+        color = get_driver_color(session, driver)
+
+        if color.lower() in [c.lower() for c in used_colors]:
+            dash = 'dash'
+        else:
+            dash = 'solid'
+        used_colors.append(color)
+
+        fig.add_trace(go.Scatter(
+            x=circuit_types,
+            y=positions,
+            mode='lines+markers',
+            name=driver,
+            line=dict(color=color, width=2, dash=dash),
+            marker=dict(size=8),
+            hovertemplate=f'{driver}<br>%{{x}}: P%{{y}}<extra></extra>'))
+
+    fig.update_layout(
+        title="Driver Performance by Circuit Type",
+        xaxis_title="Circuit Type",
+        yaxis_title="Average Qualifying Position",
+        yaxis=dict(autorange='reversed')  )
+
+    fig = apply_f1_theme(fig)
+    return fig

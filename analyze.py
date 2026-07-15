@@ -443,7 +443,7 @@ def classify_circuit(dna):
     top_speed = dna['top_speed']
     high_speed = dna['high_speed_pct']
 
-    if corner_speed > 170 and high_speed > 12:
+    if corner_speed > 160 and high_speed > 10:
         label = "High Speed"
         description = "Fast flowing corners require aero efficiency and driver commitment."
     elif throttle > 60 and top_speed > 315:
@@ -461,5 +461,32 @@ def classify_circuit(dna):
     return {
         'label': label,
         'description': description,
-        'circuit': dna['circuit']
-    }               
+        'circuit': dna['circuit'] }
+                              
+
+
+
+def get_team_circuit_affinity(sessions_by_type):
+    results = {}
+
+    for circuit_type, sessions in sessions_by_type.items():
+        team_positions = {}
+        for session in sessions:
+            quali_results = session.results[['Abbreviation', 'TeamName', 'Position']]
+            for _, row in quali_results.iterrows():
+                team = row['TeamName']
+                position = row['Position']
+                if pd.isna(position) or pd.isna(team):
+                    continue
+
+                if team not in team_positions:
+                    team_positions[team] = []
+                team_positions[team].append(float(position))
+
+        team_avg = {}
+        for team, positions in team_positions.items():
+            team_avg[team] = round(sum(positions) / len(positions), 2)
+        results[circuit_type] = dict(
+            sorted(team_avg.items(), key=lambda x: x[1]) )
+
+    return results

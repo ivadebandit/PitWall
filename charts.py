@@ -787,15 +787,25 @@ def chart_tire_degradation(session, driver):
     for stint, stint_data in data.items():
         compound = stint_data['compound']
         color = compound_colors.get(compound, COLORS['red'])
+        used_compounds = []
+    
+    for stint, stint_data in data.items():
+        compound = stint_data['compound']
+        color = compound_colors.get(compound, COLORS['red'])
+        if compound in used_compounds:
+            dash = 'dash'
+        else:
+            dash = 'solid'
+        used_compounds.append(compound)
         fig.add_trace(go.Scatter(
             x=stint_data['tyre_life'],
             y=stint_data['lap_times'],
             mode='lines+markers',
             name=f"Stint {stint} - {compound} ({stint_data['deg_rate']}s/lap)",
-            line=dict(color=color, width=2),
+            line=dict(color=color, width=2, dash=dash),
             marker=dict(size=5),
             hovertemplate='Tyre age: %{x} laps<br>Lap time: %{y:.3f}s<extra></extra>'
-            ))
+        ))
 
     fig.update_layout(
         title=f"{driver} Tire Degradation",
@@ -803,4 +813,4 @@ def chart_tire_degradation(session, driver):
         yaxis_title="Lap Time (seconds)", )
     fig = apply_f1_theme(fig)
     return fig
-   
+        

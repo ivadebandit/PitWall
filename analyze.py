@@ -581,6 +581,9 @@ def get_tire_degradation(session, driver):
         stint_laps = stint_laps[
             stint_laps['PitInTime'].isna() &
             stint_laps['PitOutTime'].isna()  ]
+        stint_laps = stint_laps[stint_laps['TrackStatus'] == '1']
+        stint_laps = stint_laps[stint_laps['TyreLife'] > 2]
+        stint_laps = stint_laps[stint_laps['IsAccurate'] == True]
         if len(stint_laps) < 3:
             continue
 
@@ -600,3 +603,8 @@ def get_tire_degradation(session, driver):
             'deg_rate': deg_rate
              }
     return results
+  
+   
+     
+   
+

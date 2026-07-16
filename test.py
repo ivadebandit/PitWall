@@ -640,3 +640,4 @@ for stint, info in data.items():
 
 fig = chart_tire_degradation(session, 'VER')
 fig.show()
+             

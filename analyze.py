@@ -518,3 +518,43 @@ def get_driver_circuit_affinity(sessions_by_type):
          )
 
     return results
+
+
+
+
+
+
+
+
+
+def get_weather(sessions_wet, sessions_dry, drivers):
+    def avg_position(sessions, driver):
+        positions = []
+        for session in sessions:
+            try:
+                driver_row = session.results[
+                    session.results['Abbreviation'] == driver ]
+                if not driver_row.empty:
+                    pos = driver_row.iloc[0]['Position']
+                    if not pd.isna(pos):
+                        positions.append(float(pos))
+            except:
+                continue
+        if positions:
+            return round(sum(positions) / len(positions), 2)
+        return None
+
+    results = {}
+    for driver in drivers:
+        wet_avg = avg_position(sessions_wet, driver)
+        dry_avg = avg_position(sessions_dry, driver)
+
+        if wet_avg and dry_avg:
+            wet_advantage = round(dry_avg - wet_avg, 2)
+        else:
+            wet_advantage = None
+        results[driver] = {
+            'wet_avg': wet_avg,
+            'dry_avg': dry_avg,
+            'wet_advantage': wet_advantage    }
+    return results

@@ -735,3 +735,35 @@ def chart_driver_circuit_affinity(affinity_data, session):
 
     fig = apply_f1_theme(fig)
     return fig
+
+
+
+
+
+
+def chart_weather(weather_data, session):
+    drivers = list(weather_data.keys())
+    wet_avgs = [weather_data[d]['wet_avg'] for d in drivers]
+    dry_avgs = [weather_data[d]['dry_avg'] for d in drivers]
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        name='Dry Avg Position',
+        x=drivers,
+        y=dry_avgs,
+        marker=dict(color=COLORS['yellow']),
+        hovertemplate='%{x}<br>Dry: P%{y}<extra></extra>' ))
+    fig.add_trace(go.Bar(
+        name='Wet Avg Position',
+        x=drivers,
+        y=wet_avgs,
+        marker=dict(color=COLORS['cyan']),
+        hovertemplate='%{x}<br>Wet: P%{y}<extra></extra>'  ) )
+
+    fig.update_layout(
+        title="Wet vs Dry Qualifying Performance",
+        xaxis_title="Driver",
+        yaxis_title="Average Qualifying Position",
+        barmode='group',
+        yaxis=dict(autorange='reversed') )
+    fig = apply_f1_theme(fig)
+    return fig

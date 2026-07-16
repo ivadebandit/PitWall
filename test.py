@@ -432,7 +432,7 @@ session = get_session(2026, 'Japanese Grand Prix', 'Q')
 dna = get_circuit_dna(session)
 print(dna)"""
 
-
+"""
 
 from fetch import get_session
 from analyze import get_circuit_dna, classify_circuit
@@ -454,4 +454,174 @@ for event, name in circuits:
         result = classify_circuit(dna)
         print(f"{name}: {result['label']} (throttle:{dna['throttle_pct']}% corner:{dna['avg_corner_speed']}km/h low:{dna['low_speed_pct']}%)")
     except Exception as e:
-        print(f"{name}: Error - {e}")   
+        print(f"{name}: Error - {e}")   """
+
+
+"""
+from fetch import get_session
+from analyze import get_circuit_dna, classify_circuit
+
+circuits = [
+    ('British Grand Prix', 'Silverstone'),
+    ('Monaco Grand Prix', 'Monaco'),
+    ('Canadian Grand Prix', 'Montreal'),
+    ('Australian Grand Prix', 'Melbourne'),
+    ('Japanese Grand Prix', 'Suzuka'),
+    ('Miami Grand Prix', 'Miami'),
+    ('Barcelona Grand Prix', 'Barcelona'),
+]
+
+for event, name in circuits:
+    try:
+        session = get_session(2026, event, 'Q')
+        dna = get_circuit_dna(session)
+        result = classify_circuit(dna)
+        print(f"{name}: {result['label']}")
+    except Exception as e:
+        print(f"{name}: Error - {e}")
+        """
+
+
+"""
+
+from fetch import get_session
+from analyze import get_circuit_dna, classify_circuit, get_team_circuit_affinity
+
+sessions = {
+    'High Speed': [
+        get_session(2026, 'British Grand Prix', 'Q'),
+        get_session(2026, 'Japanese Grand Prix', 'Q'),
+    ],
+    'High Downforce': [
+        get_session(2026, 'Monaco Grand Prix', 'Q'),
+        get_session(2026, 'Miami Grand Prix', 'Q'),
+    ],
+    'Balanced': [
+        get_session(2026, 'Canadian Grand Prix', 'Q'),
+        get_session(2026, 'Barcelona Grand Prix', 'Q'),
+    ]
+}
+
+results = get_team_circuit_affinity(sessions)
+
+for circuit_type, teams in results.items():
+    print(f"\n{circuit_type}:")
+    for team, avg_pos in list(teams.items())[:5]:
+        print(f"  {team}: P{avg_pos}")
+"""
+
+
+
+"""
+
+from fetch import get_session
+from analyze import get_team_circuit_affinity
+from charts import chart_team_circuit_affinity
+
+sessions = {
+    'High Speed': [
+        get_session(2026, 'British Grand Prix', 'Q'),
+        get_session(2026, 'Japanese Grand Prix', 'Q'),
+    ],
+    'High Downforce': [
+        get_session(2026, 'Monaco Grand Prix', 'Q'),
+        get_session(2026, 'Miami Grand Prix', 'Q'),
+    ],
+    'Balanced': [
+        get_session(2026, 'Canadian Grand Prix', 'Q'),
+        get_session(2026, 'Barcelona Grand Prix', 'Q'),
+    ]
+}
+
+results = get_team_circuit_affinity(sessions)
+fig = chart_team_circuit_affinity(results)
+fig.show()
+"""
+
+
+
+"""
+from fetch import get_session
+from analyze import get_driver_circuit_affinity
+
+sessions = {
+    'High Speed': [
+        get_session(2026, 'British Grand Prix', 'Q'),
+        get_session(2026, 'Japanese Grand Prix', 'Q'),   ],
+    'High Downforce': [
+        get_session(2026, 'Monaco Grand Prix', 'Q'),
+        get_session(2026, 'Miami Grand Prix', 'Q'),
+      ],
+    'Balanced': [
+        get_session(2026, 'Canadian Grand Prix', 'Q'),
+        get_session(2026, 'Barcelona Grand Prix', 'Q'),
+    ]
+}
+
+results = get_driver_circuit_affinity(sessions)
+for circuit_type, drivers in results.items():
+    print(f"\n{circuit_type} — Top 5:")
+    for driver, avg_pos in list(drivers.items())[:5]:
+        print(f"  {driver}: P{avg_pos}")
+        """
+
+
+"""
+
+
+
+from fetch import get_session
+from analyze import get_driver_circuit_affinity
+from charts import chart_driver_circuit_affinity
+
+sessions = {
+    'High Speed': [
+        get_session(2026, 'British Grand Prix', 'Q'),
+        get_session(2026, 'Japanese Grand Prix', 'Q'),
+    ],
+    'High Downforce': [
+        get_session(2026, 'Monaco Grand Prix', 'Q'),
+        get_session(2026, 'Miami Grand Prix', 'Q'),
+    ],
+    'Balanced': [
+        get_session(2026, 'Canadian Grand Prix', 'Q'),
+        get_session(2026, 'Barcelona Grand Prix', 'Q'),
+    ]
+}
+
+results = get_driver_circuit_affinity(sessions)
+ref_session = get_session(2026, 'British Grand Prix', 'Q')
+
+fig = chart_driver_circuit_affinity(results, ref_session)
+fig.show()        """
+
+
+
+
+
+
+
+
+from fetch import get_session
+from analyze import get_weather
+from charts import chart_weather
+wet_sessions = [
+    get_session(2024, 'Monaco', 'Q'),
+    get_session(2023, 'Netherlands', 'Q'), ]
+
+dry_sessions = [
+    get_session(2026, 'British Grand Prix', 'Q'),
+    get_session(2026, 'Monaco Grand Prix', 'Q'),
+    get_session(2026, 'Japanese Grand Prix', 'Q'),
+]
+
+drivers = ['VER', 'HAM', 'LEC', 'NOR', 'RUS']
+
+results = get_weather(wet_sessions, dry_sessions, drivers)
+
+for driver, data in results.items():
+    print(f"{driver}: Wet P{data['wet_avg']} | Dry P{data['dry_avg']} | Wet advantage: {data['wet_advantage']}")
+
+ref_session = get_session(2026, 'British Grand Prix', 'Q')
+fig = chart_weather(results, ref_session)
+fig.show()

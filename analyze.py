@@ -557,4 +557,46 @@ def get_weather(sessions_wet, sessions_dry, drivers):
             'wet_avg': wet_avg,
             'dry_avg': dry_avg,
             'wet_advantage': wet_advantage    }
+    return results     
+          
+
+
+
+
+def get_tire_degradation(session, driver):
+
+
+
+    laps = get_driver_laps(session, driver)
+    laps = laps.copy()
+    laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
+    laps = laps.dropna(subset=['LapTimeSeconds', 'TyreLife', 'Stint'])
+
+    results = {}
+    for stint in laps['Stint'].unique():
+        stint_laps = laps[laps['Stint'] == stint].copy()
+        if len(stint_laps) < 3:
+            continue
+        compound = stint_laps['Compound'].iloc[0]
+        stint_laps = stint_laps[
+            stint_laps['PitInTime'].isna() &
+            stint_laps['PitOutTime'].isna()  ]
+        if len(stint_laps) < 3:
+            continue
+
+        tyre_life = stint_laps['TyreLife'].values
+        lap_times = stint_laps['LapTimeSeconds'].values
+
+        if len(tyre_life) > 1:
+            deg_rate = round(
+                (lap_times[-1] - lap_times[0]) / (tyre_life[-1] - tyre_life[0]),
+                3)
+        else:
+            deg_rate = 0
+        results[int(stint)] = {
+            'compound': compound,
+            'tyre_life': tyre_life.tolist(),
+            'lap_times': lap_times.tolist(),
+            'deg_rate': deg_rate
+             }
     return results

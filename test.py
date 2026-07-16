@@ -600,7 +600,7 @@ fig.show()        """
 
 
 
-
+"""
 
 from fetch import get_session
 from analyze import get_weather
@@ -616,12 +616,27 @@ dry_sessions = [
 ]
 
 drivers = ['VER', 'HAM', 'LEC', 'NOR', 'RUS']
-
 results = get_weather(wet_sessions, dry_sessions, drivers)
-
 for driver, data in results.items():
     print(f"{driver}: Wet P{data['wet_avg']} | Dry P{data['dry_avg']} | Wet advantage: {data['wet_advantage']}")
 
 ref_session = get_session(2026, 'British Grand Prix', 'Q')
 fig = chart_weather(results, ref_session)
+fig.show()
+ """
+
+
+
+
+from fetch import get_session
+from analyze import get_tire_degradation
+from charts import chart_tire_degradation
+
+session = get_session(2026, 'British Grand Prix', 'R')
+
+data = get_tire_degradation(session, 'VER')
+for stint, info in data.items():
+    print(f"Stint {stint} - {info['compound']}: {info['deg_rate']}s/lap degradation")
+
+fig = chart_tire_degradation(session, 'VER')
 fig.show()

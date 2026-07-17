@@ -813,4 +813,35 @@ def chart_tire_degradation(session, driver):
         yaxis_title="Lap Time (seconds)", )
     fig = apply_f1_theme(fig)
     return fig
-        
+# dudududu
+
+
+
+
+
+def chart_teammate_gap(gap_data):
+
+    driver1 = gap_data['driver1']
+    driver2 = gap_data['driver2']
+    races = gap_data['races']
+    events = [r['event'].replace(' Grand Prix', '') for r in races]
+    gaps = [r['gap'] for r in races]
+    colors = [COLORS['red'] if g < 0 else COLORS['cyan'] for g in gaps]
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=events,
+        y=gaps,
+        marker=dict(color=colors),
+        hovertemplate='%{x}<br>Gap: %{y:.3f}s<extra></extra>' ))
+    fig.add_hline(
+        y=0,
+        line=dict(color='white', width=1, dash='dash')  )
+    fig.update_layout(
+        title=f"{driver1} vs {driver2} Qualifying Gap — Season",
+        xaxis_title="Race",
+        yaxis_title=f"Gap (negative = {driver1} faster)",
+        xaxis=dict(tickangle=-45) )
+    fig = apply_f1_theme(fig)
+
+    return fig

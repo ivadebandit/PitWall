@@ -604,7 +604,45 @@ def get_tire_degradation(session, driver):
              }
     return results
   
-   
-     
-   
 
+
+
+
+def get_teammate_gap(year, team_sessions, driver1, driver2):
+
+
+
+    results = []
+    for session in team_sessions:
+        try:
+            d1_row = session.results[session.results['Abbreviation'] == driver1]
+            d2_row = session.results[session.results['Abbreviation'] == driver2]
+            if d1_row.empty or d2_row.empty:
+                continue
+            def get_best_time(row):
+                for col in ['Q3', 'Q2', 'Q1']:
+                    val = row.iloc[0][col]
+                    if not pd.isna(val):
+                        return val.total_seconds()
+                return None
+            t1 = get_best_time(d1_row)
+            t2 = get_best_time(d2_row)
+            if t1 is None or t2 is None:
+                continue
+            gap = round(t1 - t2, 3)
+            event = session.event['EventName']
+            results.append({
+                'event': event,
+                'driver1_time': round(t1, 3),
+                'driver2_time': round(t2, 3),
+                'gap': gap,
+                'faster': driver1 if gap <0 else driver2 })
+        except:
+            continue
+    return {
+        'driver1': driver1,
+        'driver2': driver2,
+        'races': results
+          }
+
+ 

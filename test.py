@@ -714,8 +714,8 @@ fig.show()
 
 
 from fetch import get_session
-from analyze import get_sector_improvement#, get_pitstop_performance
-from charts import chart_sector_improvement#, chart_pitstop_performance
+from analyze import get_sector_improvement, get_pitstop_performance
+from charts import chart_sector_improvement, chart_pitstop_performance
 
 session_r = get_session(2026, 'British Grand Prix', 'R')
 
@@ -725,3 +725,10 @@ for stint, data in sector_data.items():
 
 fig1 = chart_sector_improvement(sector_data, 'NOR')
 fig1.show()
+
+pitstops = get_pitstop_performance(session_r)
+for p in pitstops[:5]:
+    print(f"{p['driver']} Lap {p['lap']}: {p['duration']}s")
+
+fig2 = chart_pitstop_performance(pitstops, session_r)
+fig2.show()

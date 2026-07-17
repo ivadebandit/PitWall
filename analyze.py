@@ -781,7 +781,45 @@ def get_sector_improvement(session, driver):
         
         }
 
+    
     return results
+
+
+
+
+
+
+
+
+def get_pitstop_performance(session):
+
+
+    laps = session.laps.copy()
+    pit_laps = laps[laps['PitInTime'].notna() & laps['PitOutTime'].notna()].copy()
+
+    results = []
+
+    for _, row in pit_laps.iterrows():
+        try:
+            pit_duration = (row['PitOutTime'] - row['PitInTime']).total_seconds()
+            if pit_duration < 15 or pit_duration > 60:
+                continue
+
+            results.append({
+                'driver': row['Driver'],
+                'lap': int(row['LapNumber']),
+                'duration': round(pit_duration, 3),
+                'compound_new': row['Compound']
+            } )
+
+        except:
+            continue
+
+    results.sort(key=lambda x: x['duration'])
+
+    return results   
+
+
 
 
 

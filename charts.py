@@ -931,3 +931,50 @@ def chart_driver_circuit_stats(stats_data, session):
 
     fig = apply_f1_theme(fig)
     return fig
+
+
+
+
+
+
+
+def chart_sector_improvement(sector_data, driver):
+   
+   
+
+
+
+    fig = go.Figure()
+    compound_colors = {
+        'SOFT': COLORS['red'],
+        'MEDIUM': COLORS['yellow'],
+        'HARD': '#FFFFFF',
+        'INTERMEDIATE': COLORS['green'],
+        'WET': COLORS['cyan']  }
+
+    sector_dash = {'S1': 'solid', 'S2': 'dash', 'S3': 'dot'}
+    for stint, data in sector_data.items():
+        color = compound_colors.get(data['compound'], COLORS['red'])
+
+        for sector, dash in sector_dash.items():
+            fig.add_trace(go.Scatter(
+                x=data['tyre_life'],
+                y=data[sector.lower()],
+                mode='lines+markers',
+                name=f"Stint {stint} {sector} - {data['compound']}",
+                line=dict(color=color, width=2, dash=dash),
+                marker=dict(size=4),
+                hovertemplate=f'Tyre age: %{{x}}<br>{sector}: %{{y:.3f}}s<extra></extra>'
+            )   )
+
+    fig.update_layout(
+        title=f"{driver} Sector Times Across Stints",
+        xaxis_title="Tyre Age (laps)",
+        yaxis_title="Sector Time (seconds)",
+    )
+
+    fig = apply_f1_theme(fig)
+
+    return fig
+
+

@@ -737,3 +737,60 @@ def get_driver_circuit_stats(driver, location, years):
         'location': location,
         'history': results
          }
+
+
+
+
+
+
+
+
+
+
+
+
+
+def get_sector_improvement(session, driver):
+    
+
+    laps = get_driver_laps(session, driver)
+    laps = laps.copy()
+
+    laps['S1'] = laps['Sector1Time'].dt.total_seconds()
+    laps['S2'] = laps['Sector2Time'].dt.total_seconds()
+    laps['S3'] = laps['Sector3Time'].dt.total_seconds()
+    laps = laps.dropna(subset=['S1', 'S2', 'S3', 'Stint', 'TyreLife'])
+    laps = laps[laps['TrackStatus'] == '1']
+    laps = laps[laps['TyreLife'] > 2]
+
+    results = {}
+
+    for stint in laps['Stint'].unique():
+        stint_laps = laps[laps['Stint'] == stint].copy()
+
+        if len(stint_laps) < 3:
+            continue
+        compound = stint_laps['Compound'].iloc[0]
+
+        results[int(stint)] = {
+            'compound': compound,
+            'tyre_life': stint_laps['TyreLife'].tolist(),
+            's1': stint_laps['S1'].tolist(),
+            's2': stint_laps['S2'].tolist(),
+            's3': stint_laps['S3'].tolist(),
+        
+        }
+
+    return results
+
+
+
+
+
+
+
+
+
+
+
+

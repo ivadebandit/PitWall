@@ -687,7 +687,7 @@ fig = chart_fastest_lap_history(history)
 fig.show() 
 """  
 
-
+"""
 
 from analyze import get_driver_circuit_stats
 from charts import chart_driver_circuit_stats
@@ -704,5 +704,24 @@ for h in stats['history']:
 
 ref_session = get_session(2026, 'British Grand Prix', 'Q')
 fig = chart_driver_circuit_stats(stats, ref_session)
-fig.show()       
+fig.show()
+
+"""
     
+
+
+
+
+
+from fetch import get_session
+from analyze import get_sector_improvement#, get_pitstop_performance
+from charts import chart_sector_improvement#, chart_pitstop_performance
+
+session_r = get_session(2026, 'British Grand Prix', 'R')
+
+sector_data = get_sector_improvement(session_r, 'NOR')
+for stint, data in sector_data.items():
+    print(f"Stint {stint} - {data['compound']}: {len(data['tyre_life'])} laps")
+
+fig1 = chart_sector_improvement(sector_data, 'NOR')
+fig1.show()

@@ -845,3 +845,36 @@ def chart_teammate_gap(gap_data):
     fig = apply_f1_theme(fig)
 
     return fig
+
+
+
+
+
+def chart_fastest_lap_history(history_data):
+   
+
+
+    history = history_data['history']
+    years = [h['year'] for h in history]
+    times = [h['lap_time'] for h in history]
+    drivers = [h['driver'] for h in history]
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=years,
+        y=times,
+        mode='lines+markers',
+        line=dict(color=COLORS['red'], width=2),
+        marker=dict(size=8, color=COLORS['red']),
+        text=drivers,
+        hovertemplate='%{x}<br>Time: %{y:.3f}s<br>Driver: %{text}<extra></extra>'
+    ))
+
+    fig.update_layout(
+        title=f"Fastest Lap History — {history_data['location']}",
+        xaxis_title="Year",
+        yaxis_title="Fastest Lap Time (seconds)",
+        xaxis=dict(tickmode='linear', dtick=1))
+    fig = apply_f1_theme(fig)
+
+    return fig

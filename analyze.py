@@ -645,4 +645,38 @@ def get_teammate_gap(year, team_sessions, driver1, driver2):
         'races': results
           }
 
+
+
+
+
+
+def get_fastest_lap_history(location, years, session_type='Q'):
+  
+
+
+
+    results = []
+    for year in years:
+        try:
+            session = get_session(year, location, session_type)
+            fastest = session.laps.pick_fastest()
+
+            if fastest is None:
+                continue
+
+            lap_time = fastest['LapTime'].total_seconds()
+            driver = fastest['Driver']
+
+            results.append({
+                'year': year,
+                'lap_time': round(lap_time, 3),
+                'driver': driver  })
+
+        except:
+            continue
+    return {
+        'location': location,
+        'session_type': session_type,
+        'history': results
+    }
  

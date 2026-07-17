@@ -642,7 +642,7 @@ fig = chart_tire_degradation(session, 'VER')
 fig.show()"""
 
 
-
+"""
 from fetch import get_session
 from analyze import get_teammate_gap
 from charts import chart_teammate_gap
@@ -669,5 +669,19 @@ for race in data['races']:
 fig = chart_teammate_gap(data)
 fig.show()  
 
+"""
 
               
+
+from analyze import get_fastest_lap_history
+from charts import chart_fastest_lap_history
+
+history = get_fastest_lap_history(
+    'British Grand Prix',
+    [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+)
+for h in history['history']:
+    print(f"{h['year']}: {h['lap_time']}s — {h['driver']}")
+
+fig = chart_fastest_lap_history(history)
+fig.show() 

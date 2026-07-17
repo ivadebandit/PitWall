@@ -672,7 +672,7 @@ fig.show()
 """
 
               
-
+"""
 from analyze import get_fastest_lap_history
 from charts import chart_fastest_lap_history
 
@@ -685,3 +685,24 @@ for h in history['history']:
 
 fig = chart_fastest_lap_history(history)
 fig.show() 
+"""  
+
+
+
+from analyze import get_driver_circuit_stats
+from charts import chart_driver_circuit_stats
+from fetch import get_session
+stats = get_driver_circuit_stats(
+    'VER',
+    'British Grand Prix',
+    [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+)
+
+
+for h in stats['history']:
+    print(f"{h['year']}: Quali P{h['quali_pos']} | Race P{h['race_pos']} | Status: {h['status']}")
+
+ref_session = get_session(2026, 'British Grand Prix', 'Q')
+fig = chart_driver_circuit_stats(stats, ref_session)
+fig.show()       
+    

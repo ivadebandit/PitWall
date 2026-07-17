@@ -878,3 +878,56 @@ def chart_fastest_lap_history(history_data):
     fig = apply_f1_theme(fig)
 
     return fig
+
+
+
+
+
+
+
+
+def chart_driver_circuit_stats(stats_data, session):
+    
+    
+
+
+
+    driver = stats_data['driver']
+    history = stats_data['history']
+
+    years = [h['year'] for h in history]
+    quali_positions = [h['quali_pos'] for h in history]
+    race_positions = [h['race_pos'] for h in history]
+
+    color = get_driver_color(session, driver)
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=years,
+        y=quali_positions,
+        mode='lines+markers',
+        name='Qualifying',
+        line=dict(color=color, width=2, dash='dash'),
+        marker=dict(size=8),
+        hovertemplate='%{x}<br>Quali: P%{y}<extra></extra>'
+    )  )
+
+    fig.add_trace(go.Scatter(
+        x=years,
+        y=race_positions,
+        mode='lines+markers',
+        name='Race',
+        line=dict(color=color, width=2),
+        marker=dict(size=8),
+        hovertemplate='%{x}<br>Race: P%{y}<extra></extra>'))
+
+    fig.update_layout(
+        title=f"{driver} at {stats_data['location']}",
+        xaxis_title="Year",
+        yaxis_title="Position",
+        yaxis=dict(autorange='reversed'),
+        xaxis=dict(tickmode='linear', dtick=1)
+       )
+
+    fig = apply_f1_theme(fig)
+    return fig

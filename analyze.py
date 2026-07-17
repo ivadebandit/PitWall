@@ -680,3 +680,60 @@ def get_fastest_lap_history(location, years, session_type='Q'):
         'history': results
     }
  
+
+
+
+
+
+
+
+
+def get_driver_circuit_stats(driver, location, years):
+
+
+
+
+
+    results = []
+
+    for year in years:
+        try:
+            quali = get_session(year, location, 'Q')
+            driver_quali = quali.results[quali.results['Abbreviation'] == driver]
+
+            if driver_quali.empty:
+                continue
+            quali_pos = driver_quali.iloc[0]['Position']
+
+            race = get_session(year, location, 'R')
+            driver_race = race.results[race.results['Abbreviation'] == driver]
+
+            if driver_race.empty:
+                continue
+
+            race_pos = driver_race.iloc[0]['Position']
+            status = driver_race.iloc[0]['Status']
+
+            driver_laps = get_driver_laps(race, driver)
+            driver_laps = driver_laps.copy()
+            driver_laps['LapTimeSeconds'] = driver_laps['LapTime'].dt.total_seconds()
+            driver_laps = driver_laps.dropna(subset=['LapTimeSeconds'])
+
+            if not driver_laps.empty:
+                fastest = round(driver_laps['LapTimeSeconds'].min(), 3)
+            else:
+                fastest = None
+            results.append({
+                'year': year,
+                'quali_pos': int(quali_pos) if not pd.isna(quali_pos) else None,
+                'race_pos': int(race_pos) if not pd.isna(race_pos) else None,
+                'fastest_lap': fastest,
+                'status': status
+            })
+        except:
+            continue
+    return {
+        'driver': driver,
+        'location': location,
+        'history': results
+         }

@@ -831,3 +831,60 @@ def get_pitstop_performance(session):
 
     results.sort(key=lambda x: x['duration'])
     return results
+
+
+
+
+
+
+
+
+
+def get_h2h_career(driver1, driver2, locations, years):
+    
+
+    results = {}
+
+    for location in locations:
+        d1_wins = 0
+        d2_wins = 0
+        total = 0
+
+        for year in years:
+            try:
+                session = get_session(year, location, 'Q')
+
+                d1_row = session.results[session.results['Abbreviation'] == driver1]
+                d2_row = session.results[session.results['Abbreviation'] == driver2]
+
+                if d1_row.empty or d2_row.empty:
+                    continue
+
+                d1_pos = d1_row.iloc[0]['Position']
+                d2_pos = d2_row.iloc[0]['Position']
+
+                if pd.isna(d1_pos) or pd.isna(d2_pos):
+                    continue
+
+                if d1_pos < d2_pos:
+                    d1_wins += 1
+                else:
+                    d2_wins += 1
+
+                total += 1
+
+            except:
+                continue
+        if total > 0:
+            results[location.replace(' Grand Prix', '')] = {
+                'driver1_wins': d1_wins,
+                'driver2_wins': d2_wins,
+                'total': total,
+                'driver1_pct': round((d1_wins / total) * 100, 1)
+            }
+
+    return {
+        'driver1': driver1,
+        'driver2': driver2,
+        'circuits': results
+    }

@@ -1017,4 +1017,55 @@ def chart_pitstop_performance(pitstop_data, session):
     fig = apply_f1_theme(fig)
     return fig
 
+ 
 
+
+
+
+
+
+
+def chart_h2h_career(h2h_data):
+    
+
+
+
+    driver1 = h2h_data['driver1']
+    driver2 = h2h_data['driver2']
+    circuits = list(h2h_data['circuits'].keys())
+    d1_wins = [h2h_data['circuits'][c]['driver1_wins'] for c in circuits]
+    d2_wins = [h2h_data['circuits'][c]['driver2_wins'] for c in circuits]
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        name=driver1,
+        x=circuits,
+        y=d1_wins,
+        marker=dict(color=COLORS['red']),
+        hovertemplate=f'{driver1}<br>%{{x}}: %{{y}} wins<extra></extra>' ))
+
+    fig.add_trace(go.Bar(
+        name=driver2,
+        x=circuits,
+        y=[-v for v in d2_wins],
+        marker=dict(color=COLORS['cyan']),
+        hovertemplate=f'{driver2}<br>%{{x}}: %{{y}} wins<extra></extra>'
+    ))
+
+    fig.add_hline(
+        y=0,
+        line=dict(color='white', width=1, dash='dash')
+ )
+
+    fig.update_layout(
+        title=f"{driver1} vs {driver2} Career H2H Qualifying",
+        xaxis_title="Circuit",
+        yaxis_title="Wins (positive = driver1)",
+        barmode='relative',
+        xaxis=dict(tickangle=-45)
+      )
+
+    fig = apply_f1_theme(fig)
+    return fig
+       

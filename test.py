@@ -711,7 +711,7 @@ fig.show()
 
 
 
-
+"""
 
 from fetch import get_session
 from analyze import get_sector_improvement, get_pitstop_performance
@@ -732,7 +732,7 @@ for p in pitstops[:5]:
 
 fig2 = chart_pitstop_performance(pitstops, session_r)
 fig2.show()
- 
+"""
   
    
 """
@@ -745,3 +745,25 @@ print(f"Found {len(pitstops)} pit stops")
 for p in pitstops[:5]:
     print(p)
 """
+
+
+
+
+
+
+
+from analyze import get_h2h_career
+from charts import chart_h2h_career
+
+h2h = get_h2h_career(
+    'VER', 'HAM',
+    ['British Grand Prix', 'Monaco Grand Prix', 'Italian Grand Prix',
+     'Japanese Grand Prix', 'Australian Grand Prix'],
+    [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+)
+
+for circuit, data in h2h['circuits'].items():
+    print(f"{circuit}: VER {data['driver1_wins']} - {data['driver2_wins']} HAM")
+
+fig = chart_h2h_career(h2h)
+fig.show()

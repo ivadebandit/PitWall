@@ -792,43 +792,42 @@ def get_sector_improvement(session, driver):
 
 
 def get_pitstop_performance(session):
-
+  
 
     laps = session.laps.copy()
-    pit_laps = laps[laps['PitInTime'].notna() & laps['PitOutTime'].notna()].copy()
-
     results = []
 
-    for _, row in pit_laps.iterrows():
-        try:
-            pit_duration = (row['PitOutTime'] - row['PitInTime']).total_seconds()
-            if pit_duration < 15 or pit_duration > 60:
-                continue
+    drivers = laps['Driver'].unique()
 
-            results.append({
-                'driver': row['Driver'],
-                'lap': int(row['LapNumber']),
-                'duration': round(pit_duration, 3),
-                'compound_new': row['Compound']
-            } )
+    for driver in drivers:
+        driver_laps = laps[laps['Driver'] == driver].copy()
+        driver_laps = driver_laps.sort_values('LapNumber')
 
-        except:
-            continue
+        for _, row in driver_laps.iterrows():          
+            if pd.notna(row['PitInTime']):
+                pit_in = row['PitInTime']
+                lap_num = int(row['LapNumber'])
+
+                outlap = driver_laps[
+                    driver_laps['PitOutTime'].notna()
+                      ]
+                outlap = outlap[outlap['LapNumber'] == row['LapNumber'] + 1]
+
+                if outlap.empty:
+                    continue
+
+                pit_out = outlap.iloc[0]['PitOutTime']
+                duration = (pit_out - pit_in).total_seconds()
+
+                if duration < 15 or duration > 60:
+                    continue
+
+                results.append({
+                    'driver': driver,
+                    'lap': lap_num,
+                    'duration': round(duration, 3),
+                    'compound_new': outlap.iloc[0]['Compound']
+                }  )
 
     results.sort(key=lambda x: x['duration'])
-
-    return results   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return results

@@ -732,3 +732,16 @@ for p in pitstops[:5]:
 
 fig2 = chart_pitstop_performance(pitstops, session_r)
 fig2.show()
+ 
+  
+   
+"""
+from fetch import get_session
+from analyze import get_sector_improvement, get_pitstop_performance
+from charts import chart_sector_improvement, chart_pitstop_performance
+session_r = get_session(2026, 'British Grand Prix', 'R')
+pitstops = get_pitstop_performance(session_r)
+print(f"Found {len(pitstops)} pit stops")
+for p in pitstops[:5]:
+    print(p)
+"""

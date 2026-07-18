@@ -939,33 +939,34 @@ def chart_driver_circuit_stats(stats_data, session):
 
 
 def chart_sector_improvement(sector_data, driver):
-   
-   
-
-
-
+    
     fig = go.Figure()
+
     compound_colors = {
         'SOFT': COLORS['red'],
         'MEDIUM': COLORS['yellow'],
         'HARD': '#FFFFFF',
         'INTERMEDIATE': COLORS['green'],
-        'WET': COLORS['cyan']  }
+        'WET': COLORS['cyan']
+}
 
-    sector_dash = {'S1': 'solid', 'S2': 'dash', 'S3': 'dot'}
+    used_compounds = []
+
     for stint, data in sector_data.items():
         color = compound_colors.get(data['compound'], COLORS['red'])
+        opacity = 0.4 if data['compound'] in used_compounds else 1.0
+        used_compounds.append(data['compound'])
 
-        for sector, dash in sector_dash.items():
+        for sector, width, alpha in [('s1', 3, 1.0), ('s2', 1.5, 0.6), ('s3', 1.5, 0.4)]:
             fig.add_trace(go.Scatter(
                 x=data['tyre_life'],
-                y=data[sector.lower()],
-                mode='lines+markers',
-                name=f"Stint {stint} {sector} - {data['compound']}",
-                line=dict(color=color, width=2, dash=dash),
-                marker=dict(size=4),
-                hovertemplate=f'Tyre age: %{{x}}<br>{sector}: %{{y:.3f}}s<extra></extra>'
-            )   )
+                y=data[sector],
+                mode='lines',
+                name=f"Stint {stint} {sector.upper()} - {data['compound']}",
+                line=dict(color=color, width=width),
+                opacity=opacity * alpha,
+                hovertemplate=f'Tyre age: %{{x}}<br>{sector.upper()}: %{{y:.3f}}s<extra></extra>'
+            ))
 
     fig.update_layout(
         title=f"{driver} Sector Times Across Stints",
@@ -995,8 +996,8 @@ def chart_pitstop_performance(pitstop_data, session):
 
     drivers = [f"{p['driver']} L{p['lap']}" for p in pitstop_data]
     durations = [p['duration'] for p in pitstop_data]
-    colors = [COLORS['green'] if d < 25 else COLORS['yellow'] if d < 30 else COLORS['red']
-              for d in durations]
+    colors = [COLORS['cyan'] if d < 25 else '#FFFFFF' if d < 30 else COLORS['red']
+          for d in durations]
 
     fig = go.Figure()
     fig.add_trace(go.Bar(

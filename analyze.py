@@ -888,3 +888,70 @@ def get_h2h_career(driver1, driver2, locations, years):
         'driver2': driver2,
         'circuits': results
     }
+
+
+
+
+
+
+
+def get_championship_battle(year, drivers, events):
+
+
+
+    totals = {driver: 0 for driver in drivers}
+    rounds = []
+
+    for event in events:
+        try:
+            race = get_session(year, event, 'R')
+            race_results = race.results
+        except:
+            continue
+
+        for driver in drivers:
+            driver_row = race_results[race_results['Abbreviation'] == driver]
+            if not driver_row.empty:
+                pts = driver_row.iloc[0]['Points']
+                if not pd.isna(pts):
+                    totals[driver] += float(pts)
+
+        
+        had_sprint = False
+        try:
+            sprint = get_session(year, event, 'S')
+            sprint_results = sprint.results
+            had_sprint = True
+            for driver in drivers:
+                driver_row = sprint_results[sprint_results['Abbreviation'] == driver]
+                if not driver_row.empty:
+                    pts = driver_row.iloc[0]['Points']
+                    if not pd.isna(pts):
+                        totals[driver] += float(pts)
+        except:
+            pass
+
+        
+        
+        rounds.append({
+            'round': len(rounds) + 1,
+            'event': event.replace(' Grand Prix', ''),
+            'had_sprint': had_sprint,
+            'points': {driver: round(totals[driver], 1) for driver in drivers}})
+
+    if not rounds:
+        return None
+
+    leader = max(totals, key=totals.get)
+    gaps = {driver: round(totals[leader] - totals[driver], 1) for driver in drivers}
+
+    
+    
+    return {
+        'drivers': drivers,
+        'rounds': rounds,
+        'final_points': {d: round(totals[d], 1) for d in drivers},
+        'leader': leader,
+        'gaps': gaps
+   
+       }

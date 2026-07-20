@@ -1068,4 +1068,74 @@ def chart_h2h_career(h2h_data):
 
     fig = apply_f1_theme(fig)
     return fig
-       
+    
+
+
+
+
+
+
+
+def chart_championship_battle(battle_data, session):
+
+
+
+    drivers = battle_data['drivers']
+    rounds = battle_data['rounds']
+
+    events = [r['event'] for r in rounds]
+
+    fig = go.Figure()
+
+    used_colors = []
+    for driver in drivers:
+        points = [r['points'][driver] for r in rounds]
+        color = get_team_color(session, driver)
+
+        if color.lower() in [c.lower() for c in used_colors]:
+            dash_style = 'dash'
+        else:
+            dash_style = 'solid'
+        used_colors.append(color)
+
+        fig.add_trace(go.Scatter(
+            x=events,
+            y=points,
+            mode='lines+markers',
+            name=driver,
+            line=dict(color=color, width=2, dash=dash_style),
+            marker=dict(size=6),
+            hovertemplate='%{x}<br>%{y} pts<extra></extra>'
+        ) )
+
+    sprint_rounds = [r['event'] for r in rounds if r['had_sprint']]
+    for event in sprint_rounds:
+        fig.add_vline(
+            x=event,
+            line=dict(color=COLORS['text_secondary'], width=1, dash='dot')
+        )
+
+    fig.update_layout(
+        title=f"Championship Battle — {' vs '.join(drivers)}",
+        xaxis_title="Round",
+        yaxis_title="Cumulative Points",
+        xaxis=dict(tickangle=-45)
+)
+
+    fig = apply_f1_theme(fig)
+
+    return fig
+
+
+
+
+
+
+
+def get_team_color(session, driver):
+    try:
+        driver_info = session.get_driver(driver)
+        team_name = driver_info['TeamName']
+        return TEAM_COLORS.get(team_name, DEFAULT_COLORS[0])
+    except:
+        return DEFAULT_COLORS[0]

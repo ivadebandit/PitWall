@@ -685,7 +685,7 @@ for h in history['history']:
 
 fig = chart_fastest_lap_history(history)
 fig.show() 
-"""  
+"""
 
 """
 
@@ -751,7 +751,7 @@ for p in pitstops[:5]:
 
 
 
-
+"""
 from analyze import get_h2h_career
 from charts import chart_h2h_career
 
@@ -767,3 +767,78 @@ for circuit, data in h2h['circuits'].items():
 
 fig = chart_h2h_career(h2h)
 fig.show()
+
+ """         
+
+
+
+
+
+
+"""
+from analyze import get_championship_battle
+from charts import chart_championship_battle
+
+events_2026 = [
+    'Australian Grand Prix', 'Chinese Grand Prix', 'Japanese Grand Prix',
+    'Bahrain Grand Prix', 'Saudi Arabian Grand Prix', 'Miami Grand Prix',
+    'Canadian Grand Prix', 'Spanish Grand Prix', 'Austrian Grand Prix',
+    'British Grand Prix'
+]
+
+battle = get_championship_battle(2026, ['NOR', 'PIA', 'VER'], events_2026)
+
+for r in battle['rounds']:
+    print(f"Round {r['round']} - {r['event']} (sprint: {r['had_sprint']}): {r['points']}")
+
+print(f"\nLeader: {battle['leader']}")
+print(f"Gaps: {battle['gaps']}")
+
+ref_session = get_session(2026, 'British Grand Prix', 'Q')
+fig = chart_championship_battle(battle, ref_session)
+fig.show()
+"""
+
+
+"""
+
+from analyze import get_championship_battle
+from charts import chart_championship_battle
+from fetch import get_session
+
+ref_session = get_session(2026, 'British Grand Prix', 'Q')
+fig = chart_championship_battle(battle, ref_session)
+fig.show()
+"""
+
+
+
+
+
+
+
+"""
+from fetch import get_session
+from analyze import get_championship_battle
+from charts import chart_championship_battle
+
+events_2026 = [
+    'Australian Grand Prix', 'Chinese Grand Prix', 'Japanese Grand Prix',
+    'Bahrain Grand Prix', 'Saudi Arabian Grand Prix', 'Miami Grand Prix',
+    'Canadian Grand Prix', 'Spanish Grand Prix', 'Austrian Grand Prix',
+    'British Grand Prix'
+]
+
+battle = get_championship_battle(2026, ['NOR', 'PIA', 'VER'], events_2026)
+
+for r in battle['rounds']:
+    print(f"Round {r['round']} - {r['event']} (sprint: {r['had_sprint']}): {r['points']}")
+
+print(f"\nLeader: {battle['leader']}")
+print(f"Gaps: {battle['gaps']}")
+
+ref_session = get_session(2026, 'British Grand Prix', 'Q')
+fig = chart_championship_battle(battle, ref_session)
+fig.show()
+
+"""

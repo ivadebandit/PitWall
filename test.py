@@ -842,3 +842,28 @@ fig = chart_championship_battle(battle, ref_session)
 fig.show()
 
 """
+
+
+
+
+
+
+
+
+from fetch import get_session
+from analyze import get_overtakes, get_overtake_summary
+from charts import chart_overtakes
+
+session = get_session(2026, 'Belgian Grand Prix', 'R')
+
+overtakes = get_overtakes(session)
+print(f"Found {len(overtakes)} overtakes\n")
+for ot in overtakes[:10]:
+    print(f"Lap {ot['lap']}: {ot['overtaker']} passed {ot['overtaken']}")
+
+summary = get_overtake_summary(overtakes)
+for driver, data in summary.items():
+    print(f"{driver}: {data['overtakes_made']} made, {data['times_overtaken']} overtaken")
+
+fig = chart_overtakes(summary, session)
+fig.show() 

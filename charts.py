@@ -1082,9 +1082,7 @@ def chart_championship_battle(battle_data, session):
 
     drivers = battle_data['drivers']
     rounds = battle_data['rounds']
-
     events = [r['event'] for r in rounds]
-
     fig = go.Figure()
 
     used_colors = []
@@ -1139,3 +1137,53 @@ def get_team_color(session, driver):
         return TEAM_COLORS.get(team_name, DEFAULT_COLORS[0])
     except:
         return DEFAULT_COLORS[0]
+    
+
+
+
+
+
+
+
+
+def chart_overtakes(summary, session):
+
+
+
+    sorted_drivers = sorted(
+        summary.keys(),
+        key=lambda d: summary[d]['overtakes_made'],
+        reverse=True
+    )
+
+    made = [summary[d]['overtakes_made'] for d in sorted_drivers]
+    overtaken = [summary[d]['times_overtaken'] for d in sorted_drivers]
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        x=sorted_drivers,
+        y=made,
+        name='Overtakes Made',
+        marker=dict(color=COLORS['green']),
+        hovertemplate='%{x}<br>Made: %{y}<extra></extra>'
+    ))
+
+    fig.add_trace(go.Bar(
+        x=sorted_drivers,
+        y=overtaken,
+        name='Times Overtaken',
+        marker=dict(color=COLORS['red']),
+        hovertemplate='%{x}<br>Overtaken: %{y}<extra></extra>'
+ ))
+
+    fig.update_layout(
+        title=f"Overtakes — {session.event['EventName']}",
+        xaxis_title="Driver",
+        yaxis_title="Count",
+        barmode='group'
+    )
+
+    fig = apply_f1_theme(fig)
+
+    return fig

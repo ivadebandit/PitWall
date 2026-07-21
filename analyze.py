@@ -955,3 +955,89 @@ def get_championship_battle(year, drivers, events):
         'gaps': gaps
    
        }
+
+
+
+
+
+def get_overtakes(session):
+
+
+
+    
+    
+    laps = session.laps.copy()
+    laps = laps[laps['TrackStatus'] == '1']
+    laps = laps.dropna(subset=['Position', 'LapNumber'])
+
+    lap_numbers = sorted(laps['LapNumber'].unique())
+
+    overtakes = []
+
+    for i in range(1, len(lap_numbers)):
+        prev_lap = lap_numbers[i - 1]
+        curr_lap = lap_numbers[i]
+
+        prev_positions = laps[laps['LapNumber'] == prev_lap][['Driver', 'Position']]
+        curr_positions = laps[laps['LapNumber'] == curr_lap][['Driver', 'Position']]
+
+        prev_dict = dict(zip(prev_positions['Driver'], prev_positions['Position']))
+        curr_dict = dict(zip(curr_positions['Driver'], curr_positions['Position']))
+        pit_drivers = laps[
+            (laps['LapNumber'] == curr_lap) &
+            (laps['PitInTime'].notna() | laps['PitOutTime'].notna())
+        ]['Driver'].tolist()
+
+        drivers = list(curr_dict.keys())
+
+        for a in range(len(drivers)):
+            for b in range(a + 1, len(drivers)):
+                d1 = drivers[a]
+                d2 = drivers[b]
+
+                if d1 not in prev_dict or d2 not in prev_dict:
+                    continue
+                if d1 in pit_drivers or d2 in pit_drivers:
+                    continue
+
+                prev_order = prev_dict[d1] < prev_dict[d2]
+                curr_order = curr_dict[d1] < curr_dict[d2]
+
+                if prev_order != curr_order:
+                    if curr_order:
+                        overtaker, overtaken = d1, d2
+                    else:
+                        overtaker, overtaken = d2, d1
+
+                    overtakes.append({
+                        'lap': int(curr_lap),
+                        'overtaker': overtaker,
+                        'overtaken': overtaken })
+
+    return overtakes
+
+
+
+
+
+
+
+def get_overtake_summary(overtakes):
+
+
+
+    summary = {}
+
+    for ot in overtakes:
+        overtaker = ot['overtaker']
+        overtaken = ot['overtaken']
+
+        if overtaker not in summary:
+            summary[overtaker] = {'overtakes_made': 0, 'times_overtaken': 0}
+        if overtaken not in summary:
+            summary[overtaken] = {'overtakes_made': 0, 'times_overtaken': 0}
+
+        summary[overtaker]['overtakes_made'] += 1
+        summary[overtaken]['times_overtaken'] += 1
+
+    return summary

@@ -1187,3 +1187,46 @@ def chart_overtakes(summary, session):
     fig = apply_f1_theme(fig)
 
     return fig
+
+
+
+
+
+
+
+
+def chart_track_evolution(evolution_data, session):
+
+
+
+    fig = go.Figure()
+    x_vals = list(range(len(evolution_data)))
+
+    fig.add_trace(go.Scatter(
+        x=x_vals,
+        y=evolution_data['RollingAvg'],
+        mode='lines',
+        name='Field Pace (Rolling Avg)',
+        line=dict(color=COLORS['cyan'], width=2),
+        hovertemplate='Lap %{x}<br>Field Avg: %{y:.3f}s<extra></extra>'))
+
+    fig.add_trace(go.Scatter(
+        x=x_vals,
+        y=evolution_data['SessionBest'],
+        mode='lines',
+        name='Session Best So Far',
+        line=dict(color=COLORS['yellow'], width=2, dash='dash'),
+        hovertemplate='Lap %{x}<br>Best: %{y:.3f}s<extra></extra>'
+     ) )
+
+    fig.update_layout(
+        title=f"Track Evolution — {session.event['EventName']}",
+        xaxis_title="Chronological Lap Order",
+        yaxis_title="Lap Time (seconds)",
+    )
+
+    fig = apply_f1_theme(fig)
+
+    return fig
+
+ 

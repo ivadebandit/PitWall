@@ -849,7 +849,7 @@ fig.show()
 
 
 
-
+"""
 from fetch import get_session
 from analyze import get_overtakes, get_overtake_summary
 from charts import chart_overtakes
@@ -867,3 +867,25 @@ for driver, data in summary.items():
 
 fig = chart_overtakes(summary, session)
 fig.show() 
+"""
+
+
+
+
+
+
+
+from fetch import get_session
+from analyze import get_track_evolution
+from charts import chart_track_evolution
+
+session = get_session(2026, 'British Grand Prix', 'Q')
+
+evolution = get_track_evolution(session)
+print(evolution.head(10))
+print(f"\nSession best by end: {evolution['SessionBest'].iloc[-1]:.3f}s")
+print(f"Field avg first 5: {evolution['RollingAvg'].iloc[4]:.3f}s")
+print(f"Field avg last 5: {evolution ['RollingAvg'].iloc[-1]:.3f}s")
+
+fig = chart_track_evolution(evolution, session)
+fig.show()

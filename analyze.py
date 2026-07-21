@@ -1041,3 +1041,29 @@ def get_overtake_summary(overtakes):
         summary[overtaken]['times_overtaken'] += 1
 
     return summary
+
+
+
+
+
+
+
+def get_track_evolution(session, window=5, threshold_pct=115):
+
+
+
+    laps = session.laps.copy()
+    laps = laps.dropna(subset=['LapTime', 'LapStartTime'])
+    laps = laps[laps['IsAccurate'] == True]
+    laps = laps[laps['TrackStatus'] == '1']
+
+    laps = laps.copy()
+    laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
+
+    overall_best = laps['LapTimeSeconds'].min()
+    laps = laps[laps['LapTimeSeconds'] <= overall_best * (threshold_pct / 100)]
+
+    laps = laps.sort_values('LapStartTime').reset_index(drop=True)
+    laps['SessionBest'] = laps['LapTimeSeconds'].cummin()
+    laps['RollingAvg'] = laps['LapTimeSeconds'].rolling(window, min_periods=1).mean()
+    return laps[['LapStartTime', 'Driver', 'LapTimeSeconds', 'SessionBest', 'RollingAvg']]

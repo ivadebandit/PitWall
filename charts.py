@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.collections as mc
 import numpy as np
 from analyze import get_clean_laps, get_race_pace, get_head_to_head, get_h2h_summary, get_consistency_score
-from analyze import get_quali_laps, get_position_change, get_driver_laps, detect_mistakes
+from analyze import get_quali_laps, get_position_change, get_driver_laps, detect_mistakes, get_drs_effect
 
 
 COLORS = {
@@ -1229,4 +1229,47 @@ def chart_track_evolution(evolution_data, session):
 
     return fig
 
- 
+
+
+
+def chart_drs_effect(session, driver, lap_number=None):
+
+
+
+    result = get_drs_effect(session, driver, lap_number)
+    telemetry = result['telemetry']
+
+    color = get_driver_color(session, driver)
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=telemetry['Distance'],
+        y=telemetry['Speed'],
+        mode='lines',
+        name=f"{driver} Speed",
+        line=dict(color=color, width=2),
+        hovertemplate='Distance: %{x:.0f}m<br>Speed: %{y:.1f} km/h<extra></extra>'
+    ))
+
+    for zone in result['zones']:
+        fig.add_vrect(
+            x0=zone['distance_start'],
+            x1=zone['distance_end'],
+            fillcolor=COLORS['green'],
+            opacity=0.15,
+            line_width=0,
+            annotation_text=f"+{zone['speed_gain']} km/h",
+            annotation_position="top left",
+            annotation=dict(font=dict(color=COLORS['green'], size=10))
+        )
+
+    fig.update_layout(
+        title=f"{driver} DRS Zones — Lap {result['lap_number']}",
+        xaxis_title="Distance (m)",
+        yaxis_title="Speed (km/h)",
+    )
+
+    fig = apply_f1_theme(fig)
+
+    return fig

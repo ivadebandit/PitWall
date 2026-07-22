@@ -1273,3 +1273,50 @@ def chart_drs_effect(session, driver, lap_number=None):
     fig = apply_f1_theme(fig)
 
     return fig
+
+
+# pola chas minus deneska
+
+
+
+
+
+
+def chart_lap_delta(delta_data, session):
+
+
+
+    color2 = get_driver_color(session, delta_data['driver2'])
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=delta_data['distance'],
+        y=delta_data['delta'],
+        mode='lines',
+        fill='tozeroy',
+        line=dict(color=color2, width=2),
+        fillcolor='rgba(255,255,255,0.08)',
+        hovertemplate='Distance: %{x:.0f}m<br>Delta: %{y:.3f}s<extra></extra>'))
+
+    fig.add_hline(
+        y=0,
+        line=dict(color='white', width=1, dash='dash')
+    )
+
+    fig.update_layout(
+        title=f"{delta_data['driver1']} vs {delta_data['driver2']} Lap Delta",
+        xaxis_title="Distance (m)",
+        yaxis_title=f"Delta (s) — positive = {delta_data['driver2']} slower",
+        annotations=[
+            dict(
+                x=0.5, y=1.08, xref='paper', yref='paper',
+                text=f"Final gap: {delta_data['final_gap']}s",
+                showarrow=False,
+                font=dict(size=12, color=COLORS['text_secondary'])
+            )
+        ]
+    )
+
+    fig = apply_f1_theme(fig)
+
+    return fig

@@ -1078,7 +1078,7 @@ def get_track_evolution(session, window=5, threshold_pct=115):
 
 
 def get_drs_effect(session, driver, lap_number=None):
-
+# data has to be pre 2026 because of the new regs and there is no drs now
 
 
     laps = session.laps.pick_drivers(driver)
@@ -1140,3 +1140,46 @@ def get_drs_effect(session, driver, lap_number=None):
         'zones': zones,
         'telemetry': telemetry
     }
+
+
+
+
+
+
+
+
+def get_lap_delta(session, driver1, driver2, lap1_number=None, lap2_number=None):
+
+
+
+
+    laps1 = session.laps.pick_drivers(driver1)
+    laps2 = session.laps.pick_drivers(driver2)
+
+    lap1 = laps1.pick_fastest() if lap1_number is None else laps1[laps1['LapNumber'] == lap1_number].iloc[0]
+    lap2 = laps2.pick_fastest() if lap2_number is None else laps2[laps2['LapNumber'] == lap2_number].iloc[0]
+
+    tel1 = lap1.get_telemetry()[['Distance', 'Time']].dropna().copy()
+    tel2 = lap2.get_telemetry()[['Distance', 'Time']].dropna().copy()
+
+    tel1['Elapsed'] = (tel1['Time'] - tel1['Time'].iloc[0]).dt.total_seconds()
+    tel2['Elapsed'] = (tel2['Time'] - tel2['Time'].iloc[0]).dt.total_seconds()
+
+    max_distance = min(tel1['Distance'].max(), tel2['Distance'].max())
+    distance_grid = np.arange(0, max_distance, 10)
+
+    interp1 = interpolate.interp1d(tel1['Distance'], tel1['Elapsed'], kind='linear', fill_value='extrapolate')
+    interp2 = interpolate.interp1d(tel2['Distance'], tel2['Elapsed'], kind='linear', fill_value='extrapolate')
+
+    delta = interp2(distance_grid) - interp1(distance_grid)
+
+    return {
+        'driver1': driver1,
+        'driver2': driver2,
+        'lap1_number': int(lap1['LapNumber']),
+        'lap2_number': int(lap2['LapNumber']),
+        'distance': distance_grid,
+        'delta': delta,
+        'final_gap': round(delta[-1], 3)}
+
+

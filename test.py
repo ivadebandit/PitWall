@@ -953,3 +953,20 @@ print(telemetry['DRS'].unique())
 
 
 
+from fetch import get_session
+from analyze import get_lap_delta
+from charts import chart_lap_delta
+
+session = get_session(2026, 'British Grand Prix', 'Q')
+
+delta = get_lap_delta(session, 'NOR', 'PIA')
+print(f"{delta['driver1']} lap {delta['lap1_number']} vs {delta['driver2']} lap {delta['lap2_number']}")
+print(f"Final gap: {delta['final_gap']}s")
+
+fig = chart_lap_delta(delta, session)
+fig.show()
+
+
+
+
+

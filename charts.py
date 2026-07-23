@@ -1275,7 +1275,6 @@ def chart_drs_effect(session, driver, lap_number=None):
     return fig
 
 
-# pola chas minus deneska
 
 
 
@@ -1320,3 +1319,79 @@ def chart_lap_delta(delta_data, session):
     fig = apply_f1_theme(fig)
 
     return fig
+
+
+
+
+
+
+
+
+
+def chart_driver_standings(standings_data, session):
+
+
+
+    final = standings_data['final_standings']
+    drivers = list(final.keys())
+    points = list(final.values())
+
+    colors = [get_team_color(session, d) for d in drivers]
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=drivers,
+        y=points,
+        marker=dict(color=colors),
+        hovertemplate='%{x}<br>%{y} pts<extra></extra>'
+    ))
+
+    fig.update_layout(
+        title="Driver Championship Standings",
+        xaxis_title="Driver",
+        yaxis_title="Points",
+    )
+
+    fig = apply_f1_theme(fig)
+
+    return fig
+
+
+
+
+def chart_constructor_standings(standings_data):
+
+
+
+    final = standings_data['final_standings']
+    teams = list(final.keys())
+    points = list(final.values())
+
+    colors = [TEAM_COLORS.get(t, DEFAULT_COLORS[0]) for t in teams]
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=teams,
+        y=points,
+        marker=dict(color=colors),
+        hovertemplate='%{x}<br>%{y} pts<extra></extra>'
+    ))
+
+    fig.update_layout(
+        title="Constructor Championship Standings",
+        xaxis_title="Team",
+        yaxis_title="Points",
+        xaxis=dict(tickangle=-45)
+    )
+
+    fig = apply_f1_theme(fig)
+
+    return fig
+
+
+
+
+
+
+
+

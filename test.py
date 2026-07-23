@@ -952,7 +952,7 @@ print(telemetry['DRS'].unique())
 
 
 
-
+"""
 from fetch import get_session
 from analyze import get_lap_delta
 from charts import chart_lap_delta
@@ -965,7 +965,38 @@ print(f"Final gap: {delta['final_gap']}s")
 
 fig = chart_lap_delta(delta, session)
 fig.show()
+"""
 
+
+
+
+from fetch import get_session
+from analyze import get_driver_standings, get_constructor_standings
+from charts import chart_driver_standings, chart_constructor_standings
+
+events_2026 = [
+    'Australian Grand Prix', 'Chinese Grand Prix', 'Japanese Grand Prix',
+    'Bahrain Grand Prix', 'Saudi Arabian Grand Prix', 'Miami Grand Prix',
+    'Canadian Grand Prix', 'Spanish Grand Prix', 'Austrian Grand Prix',
+    'British Grand Prix'
+]
+
+driver_standings = get_driver_standings(2026, events_2026)
+print("Driver Standings:")
+for driver, pts in driver_standings['final_standings'].items():
+    print(f"  {driver}: {pts}")
+
+constructor_standings = get_constructor_standings(2026, events_2026)
+print("\nConstructor Standings:")
+for team, pts in constructor_standings['final_standings'].items():
+    print(f"  {team}: {pts}")
+
+ref_session = get_session(2026, 'British Grand Prix', 'Q')
+fig1 = chart_driver_standings(driver_standings, ref_session)
+fig1.show()
+
+fig2 = chart_constructor_standings(constructor_standings)
+fig2.show()
 
 
 

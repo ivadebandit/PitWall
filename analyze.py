@@ -1,0 +1,54 @@
+import pandas as pd
+import numpy as np
+from fetch import get_session, get_driver_laps
+
+
+
+def get_clean_laps(session,driver):
+    laps= get_driver_laps(session, driver)
+    laps = laps[laps['IsAccurate'] == True]
+    laps = laps[laps['Deleted'] == False]
+    laps= laps[laps['TrackStatus'] == '1']
+
+    laps = laps.dropna(subset=['LapTime'])
+    laps = laps.copy()
+    laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
+    best_time = laps['LapTimeSeconds'].min()
+    laps = laps[laps['LapTimeSeconds'] <= best_time * 1.15]
+    return laps.drop(columns=['LapTimeSeconds'])
+
+
+
+
+
+def get_race_pace(session, driver):
+    laps = get_clean_laps(session, driver)
+    laps = laps.copy()
+    laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
+    pace= laps.groupby('Stint').agg(
+        AvgLapTime=('LapTimeSeconds', 'mean'),
+        Compound = ('Compound', 'first'),
+        Lapcount=('LapNumber', 'count')
+    ).reset_index()
+    return pace
+
+
+
+
+
+def get_h2h(session, driver1, driver2):
+    
+    
+    
+    laps1 = get_clean_laps(session,driver1)
+    laps2 = get_clean_laps(session,driver2)
+    laps1 = laps1.copy()
+    laps2 = laps2.copy()
+    laps1['LapTimeSeconds'] =laps1['LapTime'].dt.total_seconds()
+    laps2['LapTimeSeconds'] = laps2['LapTime'].dt.total_seconds()
+    laps1['Driver'] = driver1
+    laps2['Driver'] = driver2
+
+    combined = pd.concat([laps1, laps2])
+    return combined
+    

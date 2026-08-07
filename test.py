@@ -1,11 +1,7 @@
-import os
-import fastf1
 
-
-os.makedirs('fastf1_cache', exist_ok=True)
-fastf1.Cache.enable_cache('fastf1_cache')
-print("testing")
-session = fastf1.get_session(2026, 'Hungary', 'Q')
-session.load(telemetry=False, weather=False)
-fastest_lap = session.laps.pick_fastest()
-print(f"pole: {fastest_lap['Driver']} with a time of {fastest_lap['LapTime']}")
+from fetch import get_session
+from analyze import get_race_pace, get_h2h
+session = get_session(2026, 'Hungary', 'R')
+print("--- VER Race Pace by Stint ---")
+pace = get_race_pace(session, 'VER')
+print(pace)

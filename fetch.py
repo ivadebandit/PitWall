@@ -1,7 +1,7 @@
 import fastf1
 import pandas as pd
 
-def get_session( year, location, session_type,  light=False):
+def get_session(year, location, session_type,  light=False):
     session =fastf1.get_session(year, location, session_type)
     if light:
         session.load(laps=True, telemetry=False, weather=False)

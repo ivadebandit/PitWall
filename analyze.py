@@ -51,4 +51,12 @@ def get_h2h(session, driver1, driver2):
 
     combined = pd.concat([laps1, laps2])
     return combined
-    
+
+
+def get_consistency_score(session, driver):
+    laps = get_clean_laps(session, driver)
+    laps = laps.copy()
+    laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
+    score = laps['LapTimeSeconds'].std()
+
+    return round(score,3)

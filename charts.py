@@ -88,6 +88,23 @@ def apply_f1_theme(fig):
             tickfont=dict(size=11)),
 
         yaxis=dict(
+            gridcolor=COLORS['grid'],
+            zerolinecolor=COLORS['grid'],
+            linecolor=COLORS['border'],
+            tickcolor=COLORS['text_secondary'],
+            tickfont=dict(size=11)
+        ),
+        legend=dict(
+            bgcolor=COLORS['paper'],
+            bordercolor=COLORS['border'],
+            borderwidth=1,
+            font=dict(size=12)),
+        title=dict(
+            font=dict(
+                size=18,
+                family='Arial Black, Arial, sans-serif',
+                color=COLORS['text'])))
+    return fig
 
 
 
@@ -97,60 +114,3 @@ def apply_f1_theme(fig):
 
 
 
-def chart_race_pace(session, driver):
-    laps = get_clean_laps(session,driver)
-    laps= laps.copy()
-    laps['LapTimeSeconds'] =laps['LapTime'].dt.total_seconds()
-    laps = laps.dropna(subset=['LapTimeSeconds'])
-    color = get_driver_color(session, driver)
-
-
-    compound_colors ={
-        'SOFT': COLORS['soft'],
-        'MEDIUM': COLORS['medium'],
-        'HARD': COLORS['hard'],
-        'INTERMEDIATE': COLORS['inter'],
-        'WET': COLORS['wet']}
-    fig = go.Figure()
-
-    for stint in laps['Stint'].unique():
-        stint_laps = laps[laps['Stint']==stint]
-        if stint_laps.empty:
-            continue
-
-        compound = stint_laps['Compound'].iloc[0]
-        stint_color = compound_colors.get(compound, color)
-
-
-        flying_laps = stint_laps[
-            stint_laps['PitInTime'].isna() &
-            stint_laps['PitOutTime'].isna()]
-        pit_laps= stint_laps[
-            stint_laps['PitInTime'].notna() |
-            stint_laps['PitOutTime'].notna() ]
-
-        if not flying_laps.empty:
-            fig.add_trace(go.Scatter(
-                x=pit_laps['LapNumber'],
-                y=pit_laps['LapTimeSeconds'],
-                mode='markers',
-                name=f"Pit lap (Stint {int(stint)}",
-                marker=dict(size=8, color='#888888', symbol='x'),
-                hovertemplate='Lap%{x}<br>Pit lap: %{y:.3f}s<extra></extra>'))
-
-        if not pit_laps.empty:
-            fig.add_trace(go.Scatter(
-                x=pit_laps['LapNumber'],
-                y=pit_laps['LapTimeSeconds'],
-                mode='markers',
-                name=f"Pit lap (Stint {int(stint)})",
-                marker=dict(sizez=8, color='#888888', symbol='x'),
-                hovertemplate='Lap %{x}<br>Pit lap: %{y:.3f}s<extra></extra>'))
-
-
-        fig.update_layout(
-            title=f"{driver} Race Pace",
-            xaxis_title="Lap Number",
-            yaxis_title="Lap Time (seconds)",)
-        fig = apply_f1_theme(fig)
-        return fig

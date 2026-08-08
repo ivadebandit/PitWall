@@ -2,7 +2,7 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import matplotlib.collections as mc
 import numpy as np
-from analyze import get_clean_laps, get_race_pace, get_head_to_head, get_consistency_score
+from analyze import get_clean_laps, get_race_pace, get_head_to_head, get_consistency_score, get_position_change
 
 
 
@@ -232,3 +232,30 @@ def chart_head_to_head(session, driver1, driver2):
 
 
 
+
+
+def chart_position_change(session, drivers):
+    fig = go.Figure()
+    used_colors = []
+    for driver in drivers:
+        position_data = get_position_change(session, driver)
+        color = get_driver_color(session, driver)
+        if color.lower() in [c.lower() for c in used_colors]:
+            dash_style = 'dash'       
+        else:
+            dash_style = 'solid'
+        used_colors.append(color)
+        fig.add_trace(go.Scatter(
+            x=position_data['LapNumber'],
+            y=position_data['Position'],
+            mode='lines',
+            name=driver,
+            line=dict(color=color, width=2, dash=dash_style),
+            hovertemplate='Lap %{x}<br>Position: P%{y}<extra></extra>'))
+    fig.update_layout(
+        title="Position Changes During Race",
+        xaxis_title="Lap Number",
+        yaxis_title="Position",
+        yaxis=dict(autorange='reversed'))
+    fig = apply_f1_theme(fig)
+    return fig

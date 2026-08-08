@@ -68,9 +68,19 @@ fig.show()
 """                    
 
 
-
+"""
 from fetch import get_session
 from charts import chart_head_to_head
 session = get_session(2022, 'Mexico', 'R')
 fig = chart_head_to_head(session, 'VER', 'LEC')
-fig.show()
+fig.show()"""
+
+
+
+
+"""
+from fetch import get_session
+from charts import chart_position_change
+session = get_session(2021, 'Abu Dhabi', 'R')
+fig = chart_position_change(session, ['VER', 'LEC', 'HAM', 'STR', 'RIC', 'VET', 'RAI'])
+fig.show()"""

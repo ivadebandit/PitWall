@@ -86,5 +86,18 @@ def get_h2h_summary(session,driver1,driver2):
         'gap': round(diff, 3),
         'faster_driver': faster}
     return summary
+
     
 
+
+def get_position_change(session, driver):
+    laps= get_driver_laps(session,driver)
+    laps = laps.copy()
+    position_data = laps[['LapNumber', 'Position']].dropna()
+    driver_info = session.get_driver(driver)
+    grid_position= driver_info['GridPosition']
+    start_row = pd.DataFrame({
+        'LapNumber': [0],
+        'Position': [grid_position]})
+    position_data= pd.concat([start_row, position_data]).reset_index(drop=True)
+    return position_data

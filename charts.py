@@ -2,7 +2,7 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import matplotlib.collections as mc
 import numpy as np
-from analyze import get_clean_laps, get_race_pace, get_h2h
+from analyze import get_clean_laps, get_race_pace, get_h2h, get_consistency_score
 
 
 
@@ -110,7 +110,85 @@ def apply_f1_theme(fig):
 
 
 
+def chart_race_pace(session, driver):
+    laps = get_clean_laps(session, driver)
+    laps = laps.copy()
+    laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
+    laps = laps.dropna(subset=['LapTimeSeconds'])
+    color = get_driver_color(session, driver)
+    compound_colors = {
+        'SOFT': COLORS['soft'],
+        'MEDIUM': COLORS['medium'],
+        'HARD': COLORS['hard'],
+        'INTERMEDIATE': COLORS['inter'],
+        'WET': COLORS['wet']}
+    fig = go.Figure()
+    for stint in laps['Stint'].unique():
+        stint_laps = laps[laps['Stint'] == stint]
+        if stint_laps.empty:
+            continue
+        compound = stint_laps['Compound'].iloc[0]
+        stint_color = compound_colors.get(compound, color)
+        flying_laps = stint_laps[
+            stint_laps['PitInTime'].isna() &
+            stint_laps['PitOutTime'].isna()]
+        pit_laps = stint_laps[
+            stint_laps['PitInTime'].notna() |
+            stint_laps['PitOutTime'].notna()]
+        if not flying_laps.empty:
+            fig.add_trace(go.Scatter(
+                x=flying_laps['LapNumber'],
+                y=flying_laps['LapTimeSeconds'],
+                mode='lines+markers',
+                name=f"Stint {int(stint)} - {compound}",
+                line=dict(color=stint_color, width=2),
+                marker=dict(size=4),
+                hovertemplate='Lap %{x}<br>Time: %{y:.3f}s<extra></extra>'))
+        if not pit_laps.empty:
+            fig.add_trace(go.Scatter(
+                x=pit_laps['LapNumber'],
+                y=pit_laps['LapTimeSeconds'],
+                mode='markers',
+                name=f"Pit lap (Stint {int(stint)})",
+                marker=dict(size=8, color='#888888', symbol='x'),
+                hovertemplate='Lap %{x}<br>Pit lap: %{y:.3f}s<extra></extra>'))
+    fig.update_layout(
+        title=f"{driver} Race Pace",
+        xaxis_title="Lap Number",
+        yaxis_title="Lap Time (seconds)",)
+    fig = apply_f1_theme(fig)
+    return fig
 
 
+
+
+
+
+def chart_consistency(session, drivers):
+    fig = go.Figure()
+    used_colors = []
+    for driver in drivers:
+        score = get_consistency_score(session,driver)
+        color = get_driver_color(session,driver)
+        if color.lower() in [c.lower() for c in used_colors]:
+            opacity = 0.5
+        else:
+            opacity = 1.0   
+        used_colors.append(color)
+        fig.add_trace(go.Bar(   
+            x=[driver],
+            y=[score],
+            name=driver,
+            marker=dict(
+                color=color,
+                opacity=opacity,
+                line=dict(color='white', width=1.5)),
+                hovertemplate='%{x}<br>Consistency: %{y:.3f}s<extra></extra>'))
+    fig.update_layout(
+        title="Driver Consistency Comparison",
+        xaxis_title="Driver",
+        yaxis_title="Std Devtiatiom (lower= more consistent)",)
+    fig=apply_f1_theme(fig)
+    return fig
 
 

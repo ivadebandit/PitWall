@@ -101,3 +101,18 @@ def get_position_change(session, driver):
         'Position': [grid_position]})
     position_data= pd.concat([start_row, position_data]).reset_index(drop=True)
     return position_data
+
+
+
+
+
+def get_quali_laps(session, driver):
+    laps = get_driver_laps(session,driver)
+    laps = laps.copy()
+    laps['S1']=laps['Sector1Time'].dt.total_seconds()
+    laps['S2']=laps['Sector2Time'].dt.total_seconds()
+    laps['S3']=laps['Sector3Time'].dt.total_seconds()
+    laps['LapTimeSeconds']=laps['LapTime'].dt.total_seconds()
+    laps = laps.dropna(subset=['S1', 'S2', 'S3'])
+    best_lap = laps.loc[laps['LapTimeSeconds'].idxmin()]
+    return best_lap

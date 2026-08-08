@@ -2,7 +2,7 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import matplotlib.collections as mc
 import numpy as np
-from analyze import get_clean_laps, get_race_pace, get_head_to_head, get_consistency_score, get_position_change
+from analyze import get_clean_laps, get_race_pace, get_head_to_head, get_consistency_score, get_position_change, get_quali_laps
 
 
 
@@ -257,5 +257,41 @@ def chart_position_change(session, drivers):
         xaxis_title="Lap Number",
         yaxis_title="Position",
         yaxis=dict(autorange='reversed'))
+    fig = apply_f1_theme(fig)
+    return fig
+
+
+
+
+
+
+def chart_quali_comparison(session, driver1, driver2):
+    lap1 = get_quali_laps(session, driver1)
+    lap2= get_quali_laps(session, driver2)
+    color1= get_driver_color(session, driver1)
+    color2= get_driver_color(session,driver2)
+    same_team = color1.lower() == color2.lower()
+    opacity2 = 0.5 if same_team else 1.0
+    sectors=['Sector 1', 'Sector 2', 'Sector 3']
+    times1 = [lap1['S1'], lap1['S2'], lap1['S3']]
+    times2 = [lap2['S1'], lap2['S2'], lap2['S3']]
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=sectors,
+        y=times1,
+        name = driver1,
+        marker=dict(color=color1),
+        hovertemplate='%{x}<br>Time: %{y:.3f}s<extra></extra>'))
+    fig.add_trace(go.Bar(
+        x=sectors,
+        y=times2,
+        name=driver2,
+        marker=dict(color=color2, opacity=opacity2),
+        hovertemplate='%{x}<br>Time: %{y:.3f}s<extra></extra>'))
+    fig.update_layout(
+        title=f"{driver1} vs {driver2} Qualifying Sectors",
+        xaxis_title="Sector",
+        yaxis_title="Time (seconds)",
+        barmode='group')
     fig = apply_f1_theme(fig)
     return fig

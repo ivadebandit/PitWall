@@ -84,3 +84,12 @@ from charts import chart_position_change
 session = get_session(2021, 'Abu Dhabi', 'R')
 fig = chart_position_change(session, ['VER', 'LEC', 'HAM', 'STR', 'RIC', 'VET', 'RAI'])
 fig.show()"""
+
+
+"""
+from fetch import get_session
+from charts import chart_quali_comparison
+session = get_session(2026, 'Japan', 'Q')
+fig = chart_quali_comparison(session, 'HAD', 'VER')
+fig.show()
+"""

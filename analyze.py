@@ -36,7 +36,7 @@ def get_race_pace(session, driver):
 
 
 
-def get_h2h(session, driver1, driver2):
+def get_head_to_head(session, driver1, driver2):
     
     
     
@@ -60,3 +60,31 @@ def get_consistency_score(session, driver):
     score = laps['LapTimeSeconds'].std()
 
     return round(score,3)
+
+
+
+
+
+
+def get_h2h_summary(session,driver1,driver2):
+    laps1 = get_clean_laps(session,driver1)
+    laps2 = get_clean_laps(session,driver2)
+    laps1 = laps1.copy()
+    laps2 = laps2.copy()
+    laps1['LapTimeSeconds'] = laps1['LapTime'].dt.total_seconds()
+    laps2['LapTimeSeconds'] = laps2['LapTime'].dt.total_seconds()
+    avg1 = laps1['LapTimeSeconds'].mean()
+    avg2 = laps2['LapTimeSeconds'].mean()
+    diff = abs(avg1-avg2)
+    if avg1 < avg2:
+        faster = driver1
+    else:
+        faster = driver2
+    summary = {
+        'driver1': round(avg1, 3),
+        'driver2': round(avg2, 3),
+        'gap': round(diff, 3),
+        'faster_driver': faster}
+    return summary
+    
+

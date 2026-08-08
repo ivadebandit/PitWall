@@ -66,3 +66,11 @@ session = get_session(2025, 'Abu Dhabi', 'R')
 fig = chart_consistency(session, ['VER', 'NOR'])
 fig.show()
 """                    
+
+
+
+from fetch import get_session
+from charts import chart_head_to_head
+session = get_session(2022, 'Mexico', 'R')
+fig = chart_head_to_head(session, 'VER', 'LEC')
+fig.show()

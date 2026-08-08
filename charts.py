@@ -2,7 +2,7 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import matplotlib.collections as mc
 import numpy as np
-from analyze import get_clean_laps, get_race_pace, get_h2h, get_consistency_score
+from analyze import get_clean_laps, get_race_pace, get_head_to_head, get_consistency_score
 
 
 
@@ -190,5 +190,45 @@ def chart_consistency(session, drivers):
         yaxis_title="Std Devtiatiom (lower= more consistent)",)
     fig=apply_f1_theme(fig)
     return fig
+
+
+
+
+
+
+def chart_head_to_head(session, driver1, driver2):
+    combined = get_head_to_head(session, driver1, driver2)
+    color1 = get_driver_color(session, driver1)
+    color2 = get_driver_color(session, driver2)
+    same_team = color1.lower() == color2.lower()
+    fig = go.Figure()
+    d1_laps = combined[combined['Driver']==driver1]
+    fig.add_trace(go.Scatter(
+        x=d1_laps['LapNumber'],
+        y=d1_laps['LapTimeSeconds'],
+        mode='lines+markers',
+        name=driver1,
+        line=dict(color=color1, width=2),
+        marker=dict(size=4),
+        hovertemplate='Lap %{x}<br>Time: %{y:.3f}s<extra></extra>'))
+    d2_laps = combined[combined['Driver']==driver2]
+    fig.add_trace(go.Scatter(
+        x=d2_laps['LapNumber'],
+        y=d2_laps['LapTimeSeconds'],
+        mode='lines+markers',
+        name=driver2,
+        line=dict(
+            color=color2,
+            width=2,
+            dash='dash' if same_team else 'solid'),
+        marker=dict(size=4),
+        hovertemplate='Lap %{x}<br>Time: %{y:.3f}s<extra></extra>'))
+    fig.update_layout(
+        title=f"{driver1} vs {driver2} Race Pace",
+        xaxis_title="Lap Number",
+        yaxis_title="Lap Time (seconds)",)
+    fig = apply_f1_theme(fig)
+    return fig
+
 
 

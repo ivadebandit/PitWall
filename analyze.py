@@ -116,3 +116,52 @@ def get_quali_laps(session, driver):
     laps = laps.dropna(subset=['S1', 'S2', 'S3'])
     best_lap = laps.loc[laps['LapTimeSeconds'].idxmin()]
     return best_lap
+
+
+
+import numpy as np
+from scipy import interpolate
+
+
+
+def get_telemetry_for_lap(lap):
+    telemetry = lap.get_telemetry()
+    telemetry = telemetry[['Distance', 'Speed', 'Throttle', 'Brake', 'nGear']].copy()
+    telemetry = telemetry.dropna()
+    return telemetry
+
+
+
+# do pet i dvaese
+
+def interpolate_telemetry(telemetry, distance_grid):
+    speed_interp = interpolate.interp1d(
+        telemetry['Distance'],
+        telemetry['Speed'],
+        kind='linear',
+        fill_value='extrapolate')
+    throttle_interp= interpolate.interp1d(
+        telemetry['Distance'],
+        telemetry['Throttle'],
+        kind='linear',
+        fill_value="extrapolate")
+    brake_interp = interpolate.interp1d(
+        telemetry['Distance'],
+        telemetry['Speed'],
+        kind='linear',
+        fill_value='extrapolate')
+    gear_interp= interpolate.interp1d(
+        telemetry['Distance'],
+        telemetry['nGear'],
+        kind='linear',
+        fill_value='extrapolate')
+    result = pd.DataFrame({
+        'Distance': distance_grid,
+        'Speed': speed_interp(distance_grid),
+        'Throttle': throttle_interp(distance_grid),
+        'Brake': brake_interp(distance_grid),
+        'nGear': gear_interp(distance_grid)})
+    return result
+
+
+    

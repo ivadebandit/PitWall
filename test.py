@@ -93,3 +93,38 @@ session = get_session(2026, 'Japan', 'Q')
 fig = chart_quali_comparison(session, 'HAD', 'VER')
 fig.show()
 """
+
+"""
+from fetch import get_session
+session= get_session(2026,'Monaco', 'Q')
+laps = session.laps.pick_drivers('VER')
+best_lap = laps.pick_fastest()
+telemetry = best_lap.get_telemetry()
+print(telemetry.columns.tolist())
+print(telemetry.head())
+"""
+
+
+"""
+from fetch import get_session
+import numpy as np
+from analyze import get_telemetry_for_lap, interpolate_telemetry
+session = get_session(2026, 'Belgium', 'Q')
+laps = session.laps.pick_drivers('VER')
+best_lap = laps.pick_fastest()
+telemetry = get_telemetry_for_lap(best_lap)
+max_distance = telemetry['Distance'].max()
+distance_grid = np.arange(0, max_distance, 10)
+interpolated = interpolate_telemetry(telemetry, distance_grid)
+print(f"original telem points {len(telemetry)}")
+print(f"interp points: {len(interpolated)}")
+"""
+
+
+"""
+from fetch import get_session
+session = get_session(2023, 'Monaco', 'Q')
+laps = session.laps.pick_drivers('VER')
+best_lap = laps.pick_fastest()
+telemetry = best_lap.get_telemetry()
+print(telemetry.columns.tolist())"""

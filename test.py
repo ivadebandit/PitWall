@@ -151,3 +151,11 @@ session = get_session(2024, 'Baku', 'Q')
 fig = chart_perfect_lap(session, 'VER')
 fig.show()
 """
+
+
+from fetch import get_session
+from charts import chart_quali_improvement
+session = get_session(2018, 'Qatar', 'Q')
+fig = chart_quali_improvement(session, ['PER', 'VER', 'ALO', 'HAM'])
+fig.show()
+                        

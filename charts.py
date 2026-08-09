@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.collections as mc
 import numpy as np
 from analyze import get_clean_laps, get_race_pace, get_head_to_head, get_consistency_score, get_position_change, get_quali_laps, detect_mistakes
+from analyze import get_quali_improvement
 
 
 
@@ -415,3 +416,38 @@ def chart_perfect_lap(session, driver):
     
 
 
+
+def chart_quali_improvement(session, drivers):
+    fig = go.Figure()  
+    used_colors = []
+    for driver in drivers:
+        result = get_quali_improvement(session, driver) 
+        if result is None:
+            continue
+        times = result['times']
+        color = get_driver_color(session, driver) 
+        if color.lower() in [c.lower() for c in used_colors]:
+            dash_style = 'dash'
+        else:
+            dash_style = 'solid'
+        used_colors.append(color)
+        x_vals = []
+        y_vals = []
+        for segment in ['Q1', 'Q2', 'Q3']:
+            if times[segment] is not None:
+                x_vals.append(segment)
+                y_vals.append(times[segment])
+        fig.add_trace(go.Scatter(
+            x=x_vals,
+            y=y_vals,
+            mode='lines+markers',
+            name=driver,
+            line=dict(color=color, width=2, dash=dash_style),
+            marker=dict(size=8),
+            hovertemplate='%{x}: %{y:.3f}s<extra></extra>'))
+    fig.update_layout(
+        title="Qualifying Progress Q1 - Q2 - Q3",
+        xaxis_title="Segment",
+        yaxis_title="Best Lap Time (seconds)",)
+    fig = apply_f1_theme(fig)
+    return fig

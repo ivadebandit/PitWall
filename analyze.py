@@ -274,3 +274,39 @@ def get_perfect_lap(session,driver):
         'perfect_time': round(perfect_time, 3),
         'best_actual': round(best_actual, 3),
         'time_gain': time_gain}
+
+
+
+
+def get_quali_improvement(session, driver):
+    driver_results = session.results[session.results['Abbreviation'] == driver]
+    if driver_results.empty:
+        return None
+    row = driver_results.iloc[0]
+    def to_seconds(val):
+        if pd.isna(val):
+            return None
+        return round(val.total_seconds(), 3)
+    q1 = to_seconds(row['Q1'])
+    q2 = to_seconds(row['Q2'])
+    q3 = to_seconds(row['Q3'])
+    results = {'Q1': q1, 'Q2': q2, 'Q3': q3}
+    improvements ={}
+    if q1 and q2:
+        improvements['Q1_to_Q2'] = round(q1 - q2, 3)
+    else:
+        improvements['Q1_to_Q2'] = None
+    if q2 and q3:
+        improvements['Q2_to_Q3'] = round(q2 - q3, 3)
+    else:
+        improvements['Q2_to_Q3'] = None
+    if q1 and q3:
+        improvements['Q1_to_Q3'] = round(q1 - q3, 3)
+    else:
+        improvements['Q1_to_Q3'] = None
+    return {
+        'times': results,
+        'improvements': improvements,
+        'driver': driver }
+
+

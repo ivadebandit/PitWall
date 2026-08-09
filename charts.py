@@ -369,3 +369,49 @@ def chart_track_mistakes(session, driver):
         facecolor='#1a1a2e')
     plt.show()
     return f"{driver}_mistakes.png"
+
+
+
+
+
+
+def chart_perfect_lap(session, driver):
+    from analyze import get_perfect_lap, get_quali_laps
+    result = get_perfect_lap(session, driver)
+    best_lap = get_quali_laps(session, driver)
+    color = get_driver_color(session, driver)
+    sectors = ['Sector 1', 'Sector 2', 'Sector 3']
+    perfect_times = [result['best_s1'], result['best_s2'], result['best_s3']]
+    actual_times = [best_lap['S1'], best_lap['S2'], best_lap['S3']]
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=sectors,
+        y=perfect_times,
+        name='Perfect Lap',
+        marker=dict(color=COLORS['green']),
+        hovertemplate='%{x}<br>Perfect: %{y:.3f}s<extra></extra>'))
+    fig.add_trace(go.Bar(
+        x=sectors,
+        y=actual_times,
+        name='Best Actual Lap',
+        marker=dict(color=color),
+        hovertemplate='%{x}<br>Actual: %{y:.3f}s<extra></extra>'))
+    fig.update_layout(
+        title=f"{driver} Perfect Lap Analysis",
+        xaxis_title="Sector",
+        yaxis_title="time (seconds)",
+        barmode='group',
+        annotations=[
+            dict(
+                x=0.5,
+                y=1.05,
+                xref='paper',
+                yref='paper',
+                text=f"Perfect: {result['perfect_time']}s | Best: {result['best_actual']}s | Gain: {result['time_gain']}s",
+                showarrow=False,
+                font=dict(size=12, color=COLORS['text_secondary']))])
+    fig=apply_f1_theme(fig)
+    return fig
+    
+
+

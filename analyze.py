@@ -241,3 +241,36 @@ def detect_mistakes(session, driver, lap_number=None):
     mistakes.sort(key=lambda x:x['time_lost'], reverse=True)
     return mistakes
 
+
+
+
+
+
+
+def get_perfect_lap(session,driver):
+    laps = get_driver_laps(session,driver)
+    laps =laps.copy()
+    laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
+    laps['S1']=laps['Sector1Time'].dt.total_seconds()
+    laps['S2']=laps['Sector2Time'].dt.total_seconds()
+    laps['S3']=laps['Sector3Time'].dt.total_seconds()
+    laps= laps.dropna(subset=['S1','S2','S3'])
+    best_s1=laps['S1'].min()
+    best_s2=laps['S2'].min()
+    best_s3= laps['S3'].min()
+    best_s1_lap=laps.loc[laps['S1'].idxmin(),'LapNumber']
+    best_s2_lap=laps.loc[laps['S2'].idxmin(), 'LapNumber']
+    best_s3_lap=laps.loc[laps['S3'].idxmin(), 'LapNumber']
+    perfect_time = best_s1+best_s2+best_s3
+    best_actual = laps['LapTimeSeconds'].min()
+    time_gain = round(best_actual - perfect_time, 3)
+    return {
+        'best_s1':round(best_s1, 3),
+        'best_s2': round(best_s2, 3),
+        'best_s3': round(best_s3, 3),
+        'best_s1_lap': int(best_s1_lap),
+        'best_s2_lap': int(best_s2_lap),
+        'best_s3_lap': int(best_s3_lap),
+        'perfect_time': round(perfect_time, 3),
+        'best_actual': round(best_actual, 3),
+        'time_gain': time_gain}

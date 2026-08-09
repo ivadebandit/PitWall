@@ -141,3 +141,13 @@ mistakes = detect_mistakes(session, 'STR')
 result = chart_track_mistakes(session, 'STR')
 print(result)
 """
+
+
+
+"""
+from fetch import get_session
+from charts import chart_perfect_lap
+session = get_session(2024, 'Baku', 'Q')
+fig = chart_perfect_lap(session, 'VER')
+fig.show()
+"""

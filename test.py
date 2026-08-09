@@ -83,8 +83,8 @@ from fetch import get_session
 from charts import chart_position_change
 session = get_session(2021, 'Abu Dhabi', 'R')
 fig = chart_position_change(session, ['VER', 'LEC', 'HAM', 'STR', 'RIC', 'VET', 'RAI'])
-fig.show()"""
-
+fig.show()
+"""
 
 """
 from fetch import get_session
@@ -128,3 +128,16 @@ laps = session.laps.pick_drivers('VER')
 best_lap = laps.pick_fastest()
 telemetry = best_lap.get_telemetry()
 print(telemetry.columns.tolist())"""
+
+
+
+
+"""
+from fetch import get_session
+from analyze import detect_mistakes
+from charts import chart_track_mistakes
+session = get_session(2026, 'Belgium', 'Q')
+mistakes = detect_mistakes(session, 'STR')
+result = chart_track_mistakes(session, 'STR')
+print(result)
+"""

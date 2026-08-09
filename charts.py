@@ -2,7 +2,7 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import matplotlib.collections as mc
 import numpy as np
-from analyze import get_clean_laps, get_race_pace, get_head_to_head, get_consistency_score, get_position_change, get_quali_laps
+from analyze import get_clean_laps, get_race_pace, get_head_to_head, get_consistency_score, get_position_change, get_quali_laps, detect_mistakes
 
 
 
@@ -295,3 +295,77 @@ def chart_quali_comparison(session, driver1, driver2):
         barmode='group')
     fig = apply_f1_theme(fig)
     return fig
+
+
+
+def chart_track_mistakes(session, driver):
+    laps = session.laps.pick_drivers(driver)
+    best_lap = laps.pick_fastest()
+    telemetry = best_lap.get_telemetry().add_distance()
+    mistakes = detect_mistakes(session, driver)
+    circuit_info = session.get_circuit_info()
+    fig, ax = plt.subplots(figsize=(12, 8))
+    fig.patch.set_facecolor('#0a0a0a')
+    ax.set_facecolor('#0a0a0a')
+    x = telemetry['X'].values
+    y = telemetry['Y'].values
+    speed = telemetry['Speed'].values
+    distance = telemetry['Distance'].values
+    points = np.array([x, y]).T.reshape(-1, 1, 2)
+    segments = np.concatenate([points[:-1], points[1:]], axis=1)
+    norm = plt.Normalize(speed.min(), speed.max())
+    lc = mc.LineCollection(
+        segments,
+        cmap='RdYlGn', # red = slow, yellow = medium, green = fast
+        norm=norm,
+        linewidth=3,
+        zorder=2 )
+    lc.set_array(speed[:-1])
+    ax.add_collection(lc)
+    cbar = plt.colorbar(lc, ax=ax)
+    cbar.set_label('Speed (km/h)', color='white')
+    cbar.ax.yaxis.set_tick_params(color='white')
+    plt.setp(cbar.ax.yaxis.get_ticklabels(), color='white')
+    for mistake in mistakes:
+        mask = (
+            (distance >= mistake['distance_start']) &
+            (distance <= mistake['distance_end']))
+        mistake_x = x[mask]
+        mistake_y = y[mask]
+        if len(mistake_x) > 0:
+            ax.plot(
+                mistake_x, mistake_y,
+                color='#E8002D',
+                linewidth=6,
+                zorder=3,
+                alpha=0.8)
+            worst_mask = np.abs(distance - mistake['worst_point']) < 20
+            if worst_mask.any():
+                label_x = x[worst_mask][0]
+                label_y = y[worst_mask][0]
+                ax.annotate(
+                    f"T{mistake['turn_number']}\n-{mistake['time_lost']}s",
+                    xy=(label_x, label_y),
+                    color='white',
+                    fontsize=8,
+                    fontweight='bold',
+                    bbox=dict(
+                        boxstyle='square,pad=0.3',
+                        facecolor=COLORS['red'],
+                        alpha=1.0),
+                    zorder=5)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_title(
+        f"{driver} - Mistake Analysis",
+        color='white',
+        fontsize=14,
+        pad=20)
+    plt.tight_layout()
+    plt.savefig(
+        f"{driver}_mistakes.png",
+        dpi=150,
+        bbox_inches='tight',
+        facecolor='#1a1a2e')
+    plt.show()
+    return f"{driver}_mistakes.png"

@@ -233,11 +233,11 @@ def detect_mistakes(session, driver, lap_number=None):
                     'distance_start': round(mistake_start, 1),
                     'distance_end': round(mistake_end, 1),
                     'worst_point': round(worst_distance, 1),
-                    'max_speed_lost': round(abs(worst_speed_loss),1),
+                    'max_speed_loss': round(abs(worst_speed_loss),1),
                     'time_lost': time_lost,
                     'turn_number': turn_number,
                     'corner_distance': corner_dist})
 
-        mistakes.sort(key=lambda x:x['time_lost'], reverse=True)
-        return mistakes
+    mistakes.sort(key=lambda x:x['time_lost'], reverse=True)
+    return mistakes
 

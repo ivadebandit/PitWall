@@ -132,7 +132,7 @@ def get_telemetry_for_lap(lap):
 
 
 
-# do pet i dvaese
+
 
 def interpolate_telemetry(telemetry, distance_grid):
     speed_interp = interpolate.interp1d(
@@ -164,4 +164,80 @@ def interpolate_telemetry(telemetry, distance_grid):
     return result
 
 
-    
+
+def get_corner_for_distance(circuit_info, distance):
+    corners=circuit_info.corners
+    corners=corners.copy()
+    corners['diff']=abs(corners['Distance'] - distance)
+    nearest = corners.loc[corners['diff'].idxmin()]
+    turn_number=int(nearest['Number'])
+    corner_distance=round(nearest['Distance'],1)
+    return turn_number, corner_distance
+
+
+
+
+
+
+def detect_mistakes(session, driver, lap_number=None):
+    laps = session.laps.pick_drivers(driver)
+    best_lap = laps.pick_fastest()
+    if lap_number is None:
+        sorted_laps = laps.sort_values('LapTime').dropna(subset=['LapTime'])
+        if len(sorted_laps) <2:
+            return[]
+        comparison_lap = sorted_laps.iloc[1]
+    else:
+        comparison_lap=laps[laps['LapNumber'] == lap_number].iloc[0]
+    best_telemetry=get_telemetry_for_lap(best_lap)  
+    comp_telemetry=get_telemetry_for_lap(comparison_lap)
+    max_distance =min(
+        best_telemetry['Distance'].max(),
+        comp_telemetry['Distance'].max())
+    distance_grid=np.arange(0, max_distance, 10)
+    best_interp= interpolate_telemetry(best_telemetry, distance_grid)
+    comp_interp= interpolate_telemetry(comp_telemetry, distance_grid)
+    speed_diff = comp_interp['Speed'] - best_interp['Speed']
+    mistake_threshold = -5.0
+    mistake_mask = speed_diff < mistake_threshold
+    mistakes = []
+    in_mistake = False
+    mistake_start = None
+    mistake_start = None
+    circuit_info=session.get_circuit_info()
+    for i, (is_mistake, distance) in enumerate(zip(mistake_mask, distance_grid)):
+        if is_mistake  and not in_mistake:
+            in_mistake = True
+            mistake_start =distance
+            mistake_start_idx =i
+        elif not is_mistake and in_mistake:
+            in_mistake = False
+            mistake_end = distance
+            zone_diff = speed_diff.iloc[mistake_start_idx:i]
+            worst_speed_loss = zone_diff.min()
+            worst_distance = distance_grid[mistake_start_idx + zone_diff.argmin()]
+            zone_length = mistake_end - mistake_start
+            avg_best_speed = best_interp['Speed'].iloc[mistake_start_idx:i].mean()
+            avg_comp_speed = comp_interp['Speed'].iloc[mistake_start_idx:i].mean()
+            if avg_comp_speed > 0 and avg_best_speed>0:
+                time_best = zone_length/(avg_best_speed/3.6)
+                time_comp = zone_length/(avg_comp_speed/3.6)
+                time_lost = round(time_comp - time_best, 3)
+            else:
+                time_lost =0
+            if time_lost > 0.05:
+                turn_number, corner_dist = get_corner_for_distance(
+                    circuit_info,
+                    worst_distance)
+                mistakes.append({
+                    'distance_start': round(mistake_start, 1),
+                    'distance_end': round(mistake_end, 1),
+                    'worst_point': round(worst_distance, 1),
+                    'max_speed_lost': round(abs(worst_speed_loss),1),
+                    'time_lost': time_lost,
+                    'turn_number': turn_number,
+                    'corner_distance': corner_dist})
+
+        mistakes.sort(key=lambda x:x['time_lost'], reverse=True)
+        return mistakes
+

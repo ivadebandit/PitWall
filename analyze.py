@@ -315,25 +315,25 @@ def get_quali_improvement(session, driver):
 def get_circuit_dna(session):
     fastest_lap = session.laps.pick_fastest()
     telemetry = fastest_lap.get_telemetry()
-    full_throttle = (telemetry['Throttle'] ==100).sum()
+    full_throttle = (telemetry['Throttle'] == 100).sum() 
     total_points = len(telemetry)
     throttle_pct = round((full_throttle / total_points) * 100, 1)
-    braking=(telemetry['Brake']==True).sum()
-    braking_pct=round((braking/total_points) *100, 1)
-    top_speed = round(telemetry['Speed'].max(),1)
+    braking = (telemetry['Brake'] == True).sum() 
+    braking_pct = round((braking / total_points) * 100, 1)
+    top_speed = round(telemetry['Speed'].max(), 1) 
     cornering = telemetry[
-        (telemetry['Throttle'] < 100)&
-        (telemetry['Brake']==False)]
-    if len(cornering)>0:
-        avg_corner_speed = round(cornering['Speed'].mean(),1)
+        (telemetry['Throttle'] < 100) &
+        (telemetry['Brake'] == False) ]
+    if len(cornering) > 0:
+        avg_corner_speed = round(cornering['Speed'].mean(), 1)
     else:
         avg_corner_speed = 0
-    low_speed = (telemetry['Speed'] < 120).sum()
-    low_speed_pct= round((low_speed / total_points)*100, 1)
-    high_speed_cornering= telemetry[
+    low_speed = (telemetry['Speed'] < 120).sum() 
+    low_speed_pct = round((low_speed / total_points) * 100, 1)
+    high_speed_cornering = telemetry[
         (telemetry['Speed'] > 200) &
         (telemetry['Throttle'] < 100)]
-    high_speed_pct= round((len(high_speed_cornering) / total_points) *100, 1)
+    high_speed_pct = round((len(high_speed_cornering) / total_points) * 100, 1)
     return {
         'throttle_pct': throttle_pct,
         'braking_pct': braking_pct,
@@ -341,4 +341,6 @@ def get_circuit_dna(session):
         'avg_corner_speed': avg_corner_speed,
         'low_speed_pct': low_speed_pct,
         'high_speed_pct': high_speed_pct,
-        'circuit': session.event['EventName'] }
+        'circuit': session.event['EventName'],
+        'year': session.event['EventDate'].year
+    }

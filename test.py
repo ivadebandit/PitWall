@@ -152,10 +152,33 @@ fig = chart_perfect_lap(session, 'VER')
 fig.show()
 """
 
-
+"""
 from fetch import get_session
 from charts import chart_quali_improvement
 session = get_session(2018, 'Qatar', 'Q')
 fig = chart_quali_improvement(session, ['PER', 'VER', 'ALO', 'HAM'])
 fig.show()
-                        
+"""      
+
+
+"""
+from fetch import get_session
+from analyze import get_circuit_dna
+session1 = get_session(2025, 'Hungary', 'Q')
+dna1 = get_circuit_dna(session1)
+session2 = get_session(2026, 'Hungary', 'Q')
+dna2 = get_circuit_dna(session2)
+print(f"full throttle:  {dna1['throttle_pct']}% vs {dna2['throttle_pct']}%")
+print(f"braking:{dna1['braking_pct']}% vs {dna2['braking_pct']}%")
+print(f"top speed:{dna1['top_speed']} vs {dna2['top_speed']} km/h")
+print(f"avg corner speed: {dna1['avg_corner_speed']} vs {dna2['avg_corner_speed']} km/h")
+print(f"low speed corners:{dna1['low_speed_pct']}% vs {dna2['low_speed_pct']}%")
+print(f"high speed: {dna1['high_speed_pct']}% vs {dna2['high_speed_pct']}%")
+"""
+
+from fetch import get_session
+from charts import chart_circuit_dna
+session1 =get_session(2026, 'Silverstone', 'Q')
+session2 =get_session(2026, 'Monaco', 'Q')
+fig = chart_circuit_dna([session1, session2])
+fig.show()

@@ -176,9 +176,28 @@ print(f"low speed corners:{dna1['low_speed_pct']}% vs {dna2['low_speed_pct']}%")
 print(f"high speed: {dna1['high_speed_pct']}% vs {dna2['high_speed_pct']}%")
 """
 
+
+"""
 from fetch import get_session
 from charts import chart_circuit_dna
 session1 =get_session(2026, 'Silverstone', 'Q')
 session2 =get_session(2026, 'Monaco', 'Q')
 fig = chart_circuit_dna([session1, session2])
 fig.show()
+""" 
+
+
+from fetch import get_session
+from analyze import get_circuit_dna, classify_circuit
+circuits = [
+    ('Hungarian Grand Prix', 'Hungary'),
+    ('Monaco Grand Prix', 'Monaco'),
+    ('Barcelona Grand Prix', 'Barcelona'),]
+for event, name in circuits:
+    try:
+        session = get_session(2022, event, 'FP1')
+        dna = get_circuit_dna(session)
+        result = classify_circuit(dna)
+        print(f"{name}: {result['label']} (throttle:{dna['throttle_pct']}% corner:{dna['avg_corner_speed']}km/h low:{dna['low_speed_pct']}%)")
+    except Exception as e:
+        print(f"{name}: Error - {e}")

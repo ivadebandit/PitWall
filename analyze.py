@@ -344,3 +344,37 @@ def get_circuit_dna(session):
         'circuit': session.event['EventName'],
         'year': session.event['EventDate'].year
     }
+
+
+
+
+
+
+
+
+def classify_circuit(dna):
+    throttle = dna['throttle_pct']
+    braking= dna['braking_pct']
+    corner_speed = dna['avg_corner_speed']
+    low_speed = dna['avg_corner_speed']
+    top_speed = dna['top_speed']
+    high_speed = dna['high_speed_pct']
+    if corner_speed > 160 and high_speed > 10:
+        label = "High Speed"
+        description = "Fast corners, circuit requires aero efficency and low downforce setup "
+    elif throttle > 60 and top_speed > 315:
+        label = "Power Track"
+        description = "Long straights and high top speeds, needs engine power and low drag"
+    elif low_speed > 15:
+        label = "High Downforce"
+        description = "Slow corners and lots of heavy braking, requires max downforce and mechanical grip"
+    elif braking > 25 and corner_speed < 160:
+        label = "Stop/Go"
+        description = "Many hard braking zones followed by slow corners, traction matters a lot "
+    else:
+        label = "Balanced"
+        description = "No single characteristic dominates"
+    return {
+        'label': label,
+        'description': description,
+        'circuit': dna['circuit']}

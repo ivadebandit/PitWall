@@ -266,3 +266,29 @@ ref_session = get_session(2026, 'British Grand Prix', 'Q')
 fig = chart_driver_circuit_affinity(results, ref_session)
 fig.show() 
 """
+
+
+
+
+
+
+
+
+
+"""
+from fetch import get_session
+from analyze import get_weather
+from charts import chart_weather
+wet_sessions = [
+    get_session(2024, 'Monaco', 'Q'),
+    get_session(2023, 'Netherlands', 'Q'), ]
+dry_sessions = [
+    get_session(2023, 'British Grand Prix', 'Q'),
+    get_session(2023, 'Saudi Arabin Grand Prix', 'Q'),
+    get_session(2023, 'Japanese Grand Prix', 'Q'), ]
+drivers = ['VER', 'HAM', 'LEC', 'NOR', 'RUS']
+results= get_weather(wet_sessions, dry_sessions, drivers)
+ref_session = get_session(2026, 'British Grand Prix', 'Q')
+fig = chart_weather(results, ref_session)
+fig.show()
+"""

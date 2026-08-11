@@ -378,3 +378,28 @@ def classify_circuit(dna):
         'label': label,
         'description': description,
         'circuit': dna['circuit']}
+
+
+
+
+
+def get_team_circuit_affinity(sessions_by_type):
+    results = {}
+    for circuit_type, sessions in sessions_by_type.items():
+        team_positions = {}
+        for session in sessions:
+            quali_results = session.results[['Abbreviation', 'TeamName', 'Position']]
+            for _, row in quali_results.iterrows():
+                team = row['TeamName']
+                position = row['Position']
+                if pd.isna(position) or pd.isna(team):
+                    continue
+                if team not in team_positions:
+                    team_positions[team] = []
+                team_positions[team].append(float(position))
+        team_avg = {}
+        for team, positions in team_positions.items():
+            team_avg[team] = round(sum(positions) / len(positions), 2)
+        results[circuit_type] = dict(
+            sorted(team_avg.items(), key=lambda x: x[1]))
+    return results

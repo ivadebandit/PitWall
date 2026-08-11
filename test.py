@@ -186,7 +186,7 @@ fig = chart_circuit_dna([session1, session2])
 fig.show()
 """ 
 
-
+"""
 from fetch import get_session
 from analyze import get_circuit_dna, classify_circuit
 circuits = [
@@ -201,3 +201,24 @@ for event, name in circuits:
         print(f"{name}: {result['label']} (throttle:{dna['throttle_pct']}% corner:{dna['avg_corner_speed']}km/h low:{dna['low_speed_pct']}%)")
     except Exception as e:
         print(f"{name}: Error - {e}")
+        """
+
+
+"""
+from fetch import get_session
+from analyze import get_team_circuit_affinity
+from charts import chart_team_circuit_affinity
+sessions= {
+    'High Speed': [
+        get_session(2021, 'British Grand Prix', 'Q'),
+        get_session(2021, 'Japanese Grand Prix', 'Q'),],
+    'High Downforce': [
+        get_session(2023, 'Monaco Grand Prix', 'Q'),
+        get_session(2023, 'Hungarian Grand Prix', 'Q'),],
+    'Balanced': [
+        get_session(2025, 'Canadian Grand Prix', 'Q'),
+        get_session(2025, 'Barcelona Grand Prix', 'Q'),]}
+results = get_team_circuit_affinity(sessions)
+fig = chart_team_circuit_affinity(results)
+fig.show()
+"""

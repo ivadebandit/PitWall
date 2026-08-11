@@ -506,3 +506,38 @@ def chart_circuit_dna(sessions):
     fig = apply_f1_theme(fig)
     return fig
 
+
+def chart_team_circuit_affinity(affinity_data):
+    fig = go.Figure()
+    circuit_types = list(affinity_data.keys())
+    all_teams = set()
+    for teams in affinity_data.values():
+        all_teams.update(list(teams.keys())[:5])
+    all_teams = list(all_teams)
+    team_colors = [
+        COLORS['red'], COLORS['cyan'], COLORS['yellow'],
+        COLORS['green'], COLORS['purple'], '#ff6b6b',
+        '#51cf66', '#fcc419', '#339af0', '#cc5de8' ]
+    for i, team in enumerate(all_teams):
+        positions = []
+        for circuit_type in circuit_types:
+            pos = affinity_data[circuit_type].get(team, None)
+            positions.append(pos)
+            color = TEAM_COLORS.get(team, team_colors[i % len(team_colors)])        
+        fig.add_trace(go.Bar(
+            name=team,
+            x=circuit_types,
+            y=positions,
+            marker=dict(color=color),
+            hovertemplate=f'{team}<br>%{{x}}: P%{{y:.1f}}<extra></extra>'))
+    fig.update_layout(
+        title="Team Performance by Circuit Type",
+        xaxis_title="Circuit Type",
+        yaxis_title="Average Qualifying Position",
+        barmode='group',
+        yaxis=dict(autorange='reversed') )
+    fig = apply_f1_theme(fig)
+    return fig
+
+
+

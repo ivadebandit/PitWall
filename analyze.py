@@ -411,14 +411,15 @@ def get_team_circuit_affinity(sessions_by_type):
 
 
 
+
 def get_driver_circuit_affinity(sessions_by_type):
     results = {}
     for circuit_type, sessions in sessions_by_type.items():
-        driver_positions =  {}
+        driver_positions = {}
         for session in sessions:
-            quali_results =session.results[['Abbreviation', 'Position']]
-            for _, row in quali_results.itterrows():
-                driver = row['Abberviation']
+            quali_results = session.results[['Abbreviation', 'Position']]
+            for _, row in quali_results.iterrows():
+                driver = row['Abbreviation']
                 position = row['Position']
                 if pd.isna(position) or pd.isna(driver):
                     continue
@@ -429,5 +430,5 @@ def get_driver_circuit_affinity(sessions_by_type):
         for driver, positions in driver_positions.items():
             driver_avg[driver] = round(sum(positions) / len(positions), 2)
         results[circuit_type] = dict(
-            sorted(driver_avg.items(), key=lambda x: x[1]) )
-        return results
+            sorted(driver_avg.items(), key=lambda x: x[1]))
+    return results

@@ -222,3 +222,47 @@ results = get_team_circuit_affinity(sessions)
 fig = chart_team_circuit_affinity(results)
 fig.show()
 """
+
+
+"""
+from fetch import get_session
+from analyze import get_driver_circuit_affinity
+sessions = {
+    'High Speed': [
+        get_session(2023, 'British Grand Prix', 'Q'),
+        get_session(2023, 'Japanese Grand Prix', 'Q'),   ],
+    'High Downforce': [
+        get_session(2023, 'Monaco Grand Prix', 'Q'),
+        get_session(2023, 'Miami Grand Prix', 'Q'),],
+    'Balanced': [
+        get_session(2023, 'Canadian Grand Prix', 'Q'),
+        get_session(2023, 'Barcelona Grand Prix', 'Q'),]}
+results = get_driver_circuit_affinity(sessions)
+for circuit_type, drivers in results.items():
+    print(f"\n{circuit_type} — Top 5:")
+    for driver, avg_pos in list(drivers.items())[:5]:
+        print(f"  {driver}: P{avg_pos}")
+    """
+
+
+
+
+"""
+from fetch import get_session
+from analyze import get_driver_circuit_affinity
+from charts import chart_driver_circuit_affinity
+sessions = {
+    'High Speed': [
+        get_session(2026, 'British Grand Prix', 'Q'),
+        get_session(2026, 'Japanese Grand Prix', 'Q'),],
+    'High Downforce': [
+        get_session(2026, 'Monaco Grand Prix', 'Q'),
+        get_session(2026, 'Miami Grand Prix', 'Q'),],
+    'Balanced': [
+        get_session(2026, 'Canadian Grand Prix', 'Q'),
+        get_session(2026, 'Barcelona Grand Prix', 'Q'),]}
+results = get_driver_circuit_affinity(sessions)
+ref_session = get_session(2026, 'British Grand Prix', 'Q')
+fig = chart_driver_circuit_affinity(results, ref_session)
+fig.show() 
+"""

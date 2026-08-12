@@ -352,5 +352,14 @@ fig = chart_fastest_lap_history(history)
 fig.show()"""
 
 
-
-
+"""
+from analyze import get_driver_circuit_stats
+from charts import chart_driver_circuit_stats
+stats = get_driver_circuit_stats(
+    'VER',
+    'Brazilian Grand Prix',
+    [2018,2019,2020,2021,2022,2023,2024,2025])
+ref_session = get_session(2025, 'Brazilian Grand Prix', 'Q')
+fig = chart_driver_circuit_stats(stats, ref_session)
+fig.show()
+"""

@@ -336,3 +336,21 @@ for race in data['races']:
 fig = chart_teammate_gap(data)
 fig.show()
 """
+
+
+
+
+"""
+from analyze import get_fastest_lap_history
+from charts import chart_fastest_lap_history
+history = get_fastest_lap_history(
+    'Monaco Grand Prix',
+    [2018,2019,2020,2021,2022,2023,2024,2025,2026])
+for h in history['history']:
+    print(f"{h['year']}: {h['lap_time']}s {h['driver']}")
+fig = chart_fastest_lap_history(history)
+fig.show()"""
+
+
+
+

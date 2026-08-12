@@ -1,4 +1,4 @@
-
+from fetch import get_session
 """
 
 from fetch import get_session
@@ -294,7 +294,7 @@ fig.show()
 """
 
 
-
+"""
 from fetch import get_session
 from analyze import get_tire_degradation
 from charts import chart_tire_degradation
@@ -304,3 +304,35 @@ for stint, info in data.items():
     print(f"Stint {stint} - {info['compound']}: {info['deg_rate']}s/lap deg")
 fig = chart_tire_degradation(session, 'VER')
 fig.show()
+"""
+
+
+
+
+"""
+from analyze import get_teammate_gap
+from charts import chart_teammate_gap
+events = [ 
+    'Australian Grand Prix',
+    'Chinese Grand Prix',
+    'Japanese Grand Prix',
+    'Miami Grand Prix',
+    'Canadian Grand Prix',
+    'Monaco Grand Prix',
+    'Barcelona Grand Prix',
+    'British Grand Prix',
+    'Belgium Grand Prix',
+    'Hungarian Grand Prix',]
+sessions = []
+for event in events:
+    try:
+        s = get_session(2018, event, 'Q')
+        sessions.append(s)
+    except:
+        continue
+data = get_teammate_gap(2018, sessions, 'SAI', 'VER')
+for race in data['races']:
+    print(f"{race['event']}: {race['gap']}s {race['faster']}faster")
+fig = chart_teammate_gap(data)
+fig.show()
+"""

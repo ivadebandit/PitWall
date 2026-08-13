@@ -391,4 +391,14 @@ fig.show()
 
 
 
-
+"""
+from analyze import get_h2h_career
+from charts import chart_h2h_career
+h2h = get_h2h_career(
+    'STR', 'PER',
+    ['British Grand Prix', 'Monaco Grand Prix', 'Italian Grand Prix',
+     'Japanese Grand Prix', 'Australian Grand Prix', 'Austrian Grand Prix'],
+     [2018,2019,2020,2021,2022,2023,2024,2025])
+fig = chart_h2h_career(h2h)
+fig.show()
+"""

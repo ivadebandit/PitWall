@@ -635,4 +635,34 @@ def get_sector_improvement(session, driver):
     return results
 
 
-                             
+
+
+
+
+def pit_stop_performance(session, driver):
+    laps = session.laps.copy()
+    results=[]
+    drivers = laps['Driver'].unique()
+    for driver in drivers:
+        driver_laps=laps[laps['Driver'] == driver].copy()
+        driver_laps=driver_laps.sort_values('LapNumber')
+        for _, row in driver_laps.iterrows():
+            if pd.notna(row['PitInTime']):
+                pit_in=row['PitInTime']
+                lap_num = int(row['LapNumber'])
+                outlap = driver_laps[
+                    driver_laps['PitOutTime'].notna()]
+                outlap = outlap[outlap['LapNumber'] == row['LapNumber'] +1]
+                if outlap.empty:
+                    continue
+                pit_out = outlap.iloc[0]['PitOutTime']
+                duration =(pit_out - pit_in).total_seconds()
+                if duration < 15 or duration > 60:
+                    continue
+                results.append({
+                    'driver':driver,
+                    'lap':lap_num,
+                    'duration': round(duration,3),
+                    'compound_new': outlap.iloc[0]['Compound']})
+    results.sort(key=lambda x: x['Duration'])
+    return results

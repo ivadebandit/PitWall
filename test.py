@@ -375,3 +375,20 @@ for stint, data in sector_data.items():
 fig = chart_sector_improvement(sector_data, 'VER')
 fig.show()"""
 
+
+
+
+"""
+from  analyze import get_pitstop_performance
+from charts import chart_pitstop_performance
+session_r = get_session(2021, 'Abu Dhabi Grand Prix', 'R')
+pitstops = get_pitstop_performance(session_r, 'VER')
+for p in pitstops[:5]:
+    print(f"{p['driver']} lap {p['lap']} {p['duration']}s")
+fig = chart_pitstop_performance(pitstops, session_r)
+fig.show()
+"""
+
+
+
+

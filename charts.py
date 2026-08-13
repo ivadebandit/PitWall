@@ -772,3 +772,28 @@ def chart_sector_improvement(sector_data, driver):
         yaxis_title="Sector Time (seconds)",)
     fig = apply_f1_theme(fig)
     return fig
+
+
+
+
+
+
+def chart_pitstop_performance(pitstop_data, session):
+    if not pitstop_data:
+        return go.Figure()
+    drivers=[f"{p['driver']} L{p['lap']}" for p in pitstop_data]
+    durations=[p['duration'] for p in pitstop_data]
+    colors = [COLORS['cyan'] if d < 25 else '#FFFFFF' if d < 30 else COLORS['red'] for d in durations]
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=drivers,
+        y=durations,
+        marker=dict(color=colors),
+        hovertemplate='%{x}<br>Duration: %{y:.3f}s<extra></extra>'))
+    fig.update_layout(
+        title=f"Pit Stop Performance - {session.event['EventName']}",
+        xaxis_title="Driver (lap)",
+        yaxis_title="Pit Stop Duration (seconds)",
+        xaxis=dict(tickangle=-45))
+    fig = apply_f1_theme(fig)
+    return fig

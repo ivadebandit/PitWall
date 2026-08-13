@@ -639,7 +639,7 @@ def get_sector_improvement(session, driver):
 
 
 
-def pit_stop_performance(session, driver):
+def get_pitstop_performance(session, driver):
     laps = session.laps.copy()
     results=[]
     drivers = laps['Driver'].unique()
@@ -664,5 +664,5 @@ def pit_stop_performance(session, driver):
                     'lap':lap_num,
                     'duration': round(duration,3),
                     'compound_new': outlap.iloc[0]['Compound']})
-    results.sort(key=lambda x: x['Duration'])
+    results.sort(key=lambda x: x['duration'])
     return results

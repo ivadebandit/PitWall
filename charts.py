@@ -739,3 +739,36 @@ def chart_driver_circuit_stats(stats_data, session):
         xaxis=dict(tickmode='linear', dtick=1))
     fig = apply_f1_theme(fig)
     return fig
+
+
+
+
+
+def chart_sector_improvement(sector_data, driver):
+    fig = go.Figure()
+    compound_colors = {
+        'SOFT': COLORS['red'],
+        'MEDIUM': COLORS['yellow'],
+        'HARD': '#FFFFFF',
+        'INTERMEDIATE': COLORS['green'],
+        'WET': COLORS['cyan'] }
+    used_compounds=[]
+    for stint, data in sector_data.items():
+        color = compound_colors.get(data['compound'], COLORS['red'])
+        opacity = 0.4 if data['compound'] in used_compounds else 1.0
+        used_compounds.append(data['compound'])
+        for sector, width, alpha in [('s1', 3, 1.0), ('s2', 1.5, 0.6), ('s3', 1.5, 0.4)]:
+            fig.add_trace(go.Scatter(
+                x=data['tyre_life'],
+                y=data[sector],
+                mode='lines',
+                line=dict(color=color, width=width),
+                name=f"Stint {stint} {sector.upper()} {data['compound']}",
+                opacity = opacity * alpha,
+                hovertemplate=f'Tyre age: %{{x}}<br>{sector.upper()}: %{{y:.3f}}s<extra></extra>'))
+    fig.update_layout(
+        title=f"{driver} Sector Times Across Stints",
+        xaxis_title="Tyre Age (laps)",
+        yaxis_title="Sector Time (seconds)",)
+    fig = apply_f1_theme(fig)
+    return fig

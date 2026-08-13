@@ -357,9 +357,21 @@ from analyze import get_driver_circuit_stats
 from charts import chart_driver_circuit_stats
 stats = get_driver_circuit_stats(
     'VER',
-    'Brazilian Grand Prix',
+    'Austrian Grand Prix',
     [2018,2019,2020,2021,2022,2023,2024,2025])
 ref_session = get_session(2025, 'Brazilian Grand Prix', 'Q')
 fig = chart_driver_circuit_stats(stats, ref_session)
 fig.show()
 """
+
+
+"""
+from analyze import get_sector_improvement
+from charts import chart_sector_improvement
+session_r = get_session(2025, 'Suzuka', 'R')
+sector_data= get_sector_improvement(session_r, 'VER')
+for stint, data in sector_data.items():
+    print(f"Stint {stint} {data['compound']}: {len(data['tyre_life'])} laps")
+fig = chart_sector_improvement(sector_data, 'VER')
+fig.show()"""
+

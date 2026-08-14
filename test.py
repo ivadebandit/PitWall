@@ -402,3 +402,22 @@ h2h = get_h2h_career(
 fig = chart_h2h_career(h2h)
 fig.show()
 """
+
+
+"""
+from analyze import get_championship_battle
+from charts import chart_championship_battle
+events_2026 = [
+    'Australian Grand Prix', 'Chinese Grand Prix', 'Japanese Grand Prix',
+    'Bahrain Grand Prix', 'Saudi Arabian Grand Prix', 'Miami Grand Prix',
+    'Canadian Grand Prix',  'Spanish Grand Prix', 'Austrian Grand Prix',
+    'British Grand Prix', 'Belgian Grand Prix', 'Hungarian Grand Prix']
+battle = get_championship_battle(2026, ['ANT', 'RUS', 'HAM', 'LEC', 'VER', 'HAD', 'NOR'], events_2026)
+for r in battle['rounds']: 
+    print(f"round {r['round']} - {r['event']} (sprint: {r['had_sprint']}): {r['points']}")
+    print(f"\nLeader: {battle['leader']}")
+    print(f"gaps: {battle['gaps']}")
+    ref_session = get_session(2026, 'British Grand Prix', 'Q')
+    fig = chart_championship_battle(battle, ref_session)
+    fig.show()
+"""

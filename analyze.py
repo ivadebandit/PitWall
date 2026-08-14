@@ -765,7 +765,7 @@ def get_championship_battle(year, drivers,events):
 def get_overtakes(session):
     laps = session.laps.copy()
     laps = laps[laps['TrackStatus'] =='1']
-    laps = laps.dropna(subset=['Position', 'Lap Number'])
+    laps = laps.dropna(subset=['Position', 'LapNumber'])
     lap_numbers = sorted(laps['LapNumber'].unique())
     overtakes = []
     for i in range(1, len(lap_numbers)):
@@ -801,3 +801,17 @@ def get_overtakes(session):
                         'overtaken': overtaken })
     return overtakes
 
+
+
+def get_overtake_summary(overtakes):
+    summary = {}
+    for ot in overtakes:
+        overtaker = ot['overtaker']
+        overtaken = ot['overtaken']
+        if overtaker not in summary:
+            summary[overtaker] = {'overtakes_made': 0, 'times_overtaken': 0}
+        if overtaken not in summary:
+            summary[overtaken] = {'overtakes_made': 0, 'times_overtaken': 0}
+        summary[overtaker]['overtakes_made'] +=1
+        summary[overtaken]['times_overtaken'] +=1
+    return summary

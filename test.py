@@ -421,3 +421,18 @@ for r in battle['rounds']:
     fig = chart_championship_battle(battle, ref_session)
     fig.show()
 """
+
+
+
+"""
+from analyze import get_overtakes, get_overtake_summary
+from charts import chart_overtakes
+session = get_session(2021, 'Belgian Grand Prix', 'R')
+overtakes = get_overtakes(session)
+print(f"found {len(overtakes)} overtakes\n")
+for ot in overtakes[:10]:
+    print(f"lap {ot['lap']}: {ot['overtaker']} passed {ot['overtaken']}")
+summary = get_overtake_summary(overtakes)
+fig = chart_overtakes(summary, session)
+fig.show()
+"""

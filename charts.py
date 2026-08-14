@@ -877,3 +877,37 @@ def chart_championship_battle(battle_data, session):
         xaxis=dict(tickangle=-45))
     fig = apply_f1_theme(fig)
     return fig
+
+
+
+
+
+
+
+def chart_overtakes(summary, session):
+    sorted_drivers=sorted(
+        summary.keys(),
+        key=lambda d: summary[d]['overtakes_made'],
+        reverse=True,)
+    made = [summary[d]['overtakes_made'] for d in sorted_drivers]
+    overtaken = [summary[d]['times_overtaken'] for d in sorted_drivers]
+    fig=go.Figure()
+    fig.add_trace(go.Bar(
+        x=sorted_drivers,
+        y=made,
+        name='Overtakes Made',
+        marker=dict(color=COLORS['yellow']),
+        hovertemplate='%{x}<br>Made: %{y}<extra></extra>'))
+    fig.add_trace(go.Bar(
+        x=sorted_drivers,
+        y=overtaken,
+        name='Times Overtaken',
+        marker=dict(color=COLORS['cyan']),
+        hovertemplate='%{x}<br>Overtaken: %{y}<extra></extra>'))
+    fig.update_layout(
+        title=f"Overtakes - {session.event['EventName']}",
+        xaxis_title="Driver",
+        yaxis_title="Count",
+        barmode='group')
+    fig = apply_f1_theme(fig)
+    return fig

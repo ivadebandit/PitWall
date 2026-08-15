@@ -474,5 +474,11 @@ fig.show()
 """
 
 
-
-
+"""
+from analyze import get_lap_delta
+from charts import chart_lap_delta
+session = get_session(2026, 'Monaco Grand Prix', 'Q')
+delta = get_lap_delta(session, 'VER', 'ALO')
+fig = chart_lap_delta(delta,session)
+fig.show()
+"""

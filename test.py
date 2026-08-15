@@ -449,3 +449,30 @@ print(f"field avg last 5:{evolution['RollingAvg'].iloc[-1]:.3f}s")
 fig=chart_track_evolution(evolution, session)
 fig.show()
 """
+
+
+
+
+
+"""
+from fetch import get_session
+from analyze import get_drs_effect
+from charts import chart_drs_effect
+session = get_session(2025, 'Belgian Grand Prix', 'Q')
+laps = session.laps.pick_drivers('NOR')
+fastest = laps.pick_fastest()
+telemetry = fastest.get_telemetry()
+print(telemetry['DRS'].unique())
+result = get_drs_effect(session, 'NOR')
+print(f"Lap {result['lap_number']} — {len(result['zones'])} DRS zones")
+for zone in result['zones']:
+    print(f"  {zone['distance_start']}m-{zone['distance_end']}m: "
+          f"{zone['entry_speed']} -> {zone['peak_speed']} km/h "
+          f"(+{zone['speed_gain']} km/h)")
+fig = chart_drs_effect(session, 'NOR')
+fig.show()
+"""
+
+
+
+

@@ -835,4 +835,59 @@ def get_track_evolution(session, window=5, threshold_pct=115):
     laps['RollingAvg'] = laps['LapTimeSeconds'].rolling(window, min_periods=1).mean()
     return laps[['LapStartTime', 'Driver', 'LapTimeSeconds', 'SessionBest', 'RollingAvg']]
 
+
+
  
+
+
+def get_drs_effect(session, driver, lap_number=None):
+    laps = session.laps.pick_drivers(driver)
+    if lap_number is None:
+        lap = laps.pick_fastest()
+    else: 
+        lap=laps[laps['LapNumber'] == lap_number].iloc[0]
+    telemetry = lap.get_telemetry()
+    telemetry = telemetry[['DRS', 'Speed', 'Distance']]
+    drs_open = telemetry['DRS'].isin([10,12,14])
+    zones = []
+    in_zone = False
+    zone_start_idx = None
+    for i, is_open in enumerate(drs_open):
+        if is_open and not in_zone:
+            in_zone = True
+            zone_start_idx = i
+        elif not is_open and in_zone:
+            in_zone = False
+            zone_telemetry = telemetry.iloc[zone_start_idx:i]
+            if len(zone_telemetry) < 2:
+                continue
+            entry_speed = zone_telemetry['Speed'].iloc[0]
+            peak_speed = zone_telemetry['Speed'].max()
+            exit_speed = zone_telemetry['Speed'].iloc[-1]
+            zones.append({
+                'distance_start': round(zone_telemetry['Distance'].iloc[0], 1),
+                'distance_end': round(zone_telemetry['Distance'].iloc[-1], 1),
+                'entry_speed': round(entry_speed, 1),
+                'peak_speed': round(peak_speed, 1),
+                'exit_speed': round(exit_speed, 1),
+                'speed_gain': round(entry_speed - peak_speed, 1)})
+        if in_zone:
+            zone_telemetry = telemetry.iloc[zone_start_idx: ]
+            if len(zone_telemetry) >= 2:
+                entry_speed = zone_telemetry['Speed'].iloc[0]
+                peak_speed = zone_telemetry['Speed'].max()
+                exit_speed = zone_telemetry['Speed'].iloc[-1]
+                zones.append({
+                    'distance_start': round(zone_telemetry['Distance'].iloc[0], 1),
+                    'distance_end': round(zone_telemetry['Distance'].iloc[-1], 1),
+                    'entry_speed': round(entry_speed, 1),
+                    'peak_speed': round(peak_speed, 1),
+                    'exit_speed': round(exit_speed, 1),
+                    'speed_gain': round(peak_speed - entry_speed, 1)})
+    return {
+        'driver': driver,
+        'lap_number': int(lap['LapNumber']),
+        'zones': zones,
+        'telemetry': telemetry }
+
+

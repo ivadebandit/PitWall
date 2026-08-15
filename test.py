@@ -427,12 +427,25 @@ for r in battle['rounds']:
 """
 from analyze import get_overtakes, get_overtake_summary
 from charts import chart_overtakes
-session = get_session(2021, 'Belgian Grand Prix', 'R')
+session = get_session(2025, 'Brazilian Grand Prix', 'R')
 overtakes = get_overtakes(session)
 print(f"found {len(overtakes)} overtakes\n")
 for ot in overtakes[:10]:
     print(f"lap {ot['lap']}: {ot['overtaker']} passed {ot['overtaken']}")
 summary = get_overtake_summary(overtakes)
 fig = chart_overtakes(summary, session)
+fig.show()
+"""
+
+"""
+from analyze import get_track_evolution
+from charts import chart_track_evolution
+session=get_session(2026, 'British Grand Prix', 'Q')
+evolution = get_track_evolution(session)
+print(evolution.head(10))
+print(f"\nSession best by end: {evolution['SessionBest'].iloc[-1]:.3f}s")
+print(f"field avg first 5: {evolution['RollingAvg'].iloc[4]:.3f}s")
+print(f"field avg last 5:{evolution['RollingAvg'].iloc[-1]:.3f}s")
+fig=chart_track_evolution(evolution, session)
 fig.show()
 """

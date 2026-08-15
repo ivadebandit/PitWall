@@ -821,6 +821,7 @@ def get_overtake_summary(overtakes):
 
 
 def get_track_evolution(session, window=5, threshold_pct=115):
+
     laps = session.laps.copy()
     laps = laps.dropna(subset=['LapTime', 'LapStartTime'])
     laps = laps[laps['IsAccurate'] == True]
@@ -829,8 +830,9 @@ def get_track_evolution(session, window=5, threshold_pct=115):
     laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
     overall_best = laps['LapTimeSeconds'].min()
     laps = laps[laps['LapTimeSeconds'] <= overall_best * (threshold_pct / 100)]
-    laps = laps.sort_values('LapTimeStart').reset_index(drop=True)
-    laps['SessionBest'] = laps['LapTimeSeconds'].rolling(window, min_periods=1).mean()
-    return  laps[['LapStartTime', 'Driver', 'LapTimeSeconds', 'SessionBest', 'RollingAvg']]
+    laps = laps.sort_values('LapStartTime').reset_index(drop=True)
+    laps['SessionBest'] = laps['LapTimeSeconds'].cummin()
+    laps['RollingAvg'] = laps['LapTimeSeconds'].rolling(window, min_periods=1).mean()
+    return laps[['LapStartTime', 'Driver', 'LapTimeSeconds', 'SessionBest', 'RollingAvg']]
 
  

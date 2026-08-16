@@ -1004,3 +1004,25 @@ def chart_lap_delta(delta_data, session):
                 font=dict(size=12, color=COLORS['text_secondary']))])
     fig = apply_f1_theme(fig)
     return fig
+
+
+
+
+
+def chart_driver_stamdings(standings_data, session):
+    final =standings_data['final_standings']
+    drivers = list(final.keys())
+    points = list(final.values())
+    colors = [get_driver_color(session, d) for d in drivers]
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=drivers,
+        y=points,
+        marker=dict(color=colors),
+        hovertemplate='%{x}<br>%{y} pts<extra></extra>'))
+    fig.update_layout(
+        title="Driver Championship Standings",
+        xaxis_title="Driver",
+        yaxis_title="Points",)
+    fig = apply_f1_theme(fig)
+    return fig

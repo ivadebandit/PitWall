@@ -915,3 +915,55 @@ def get_lap_delta(session, driver1, driver2, lap1_number=None, lap2_number=None)
         'distance':distance_grid,
         'delta': delta,
         'final_gap': round(delta[-1], 3)}
+
+
+
+
+def get_driver_standings(year,events):
+    totals = {}
+    rounds = []
+    for event in events:
+        try:
+            race= get_session(year, event, 'R', light=True)
+            race_results = race.results
+        except:
+            continue
+        for _, row in race_results.itterrows():
+            driver=row['Abberviation']
+            pts=row['Points']
+            if pd.isna(driver) or pd.isna(pts):
+                continue
+            if driver not in totals:
+                totals[driver]= 0
+            totals[driver] += float(pts)
+        had_sprint= False
+        try:
+            sprint = get_session(year, event, 'S', light=True)
+            sprint_results=sprint.results
+            had_sprint = True
+            for _, row in sprint_results.itterrows():
+                driver= row['Abberviation']
+                pts= row['Points']
+                if pd.isna(driver) or pd.isna(pts):
+                    continue
+                if driver not in totals:
+                    totals[driver] = 0
+                totals[driver] += float(pts)
+        except:
+            pass
+        snapshot = dict(sorted(totals.items(), key=lambda x: x[1], reverse=True))
+        rounds.append({
+            'round': len(rounds) + 1,
+            'event': event.replace(' Grand Prix', ''),
+            'had_sprint': had_sprint,
+            'standings': {d: round(p,1) for d, p in snapshot.items()}})
+        if not rounds:
+            return None
+        final_standings = dict(sorted(totals.items(), key=lambda x: x[1], reverse=True))
+        return {
+            'rounds': rounds,
+            'final_standings': {d: round(p,1) for d, p in final_standings.items()}}
+    
+
+
+
